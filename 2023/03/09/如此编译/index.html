@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="编译一段代码 寄存器 栈帧 函数调用 内存对齐 结构体传参    0x00 编写一段代码12345678910111213#include &lt;stdio.h&gt;void func1(int a, int b) &amp;#123;  int sum &#x3D; a + b;  printf(&quot;The sum of %d and %d is %d\n&quot;, a, b, sum);&amp;#1">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如此编译">
+<meta property="og:url" content="http://wujean.github.io/2023/03/09/%E5%A6%82%E6%AD%A4%E7%BC%96%E8%AF%91/index.html">
+<meta property="og:site_name" content="岳麓山下你和我">
+<meta property="og:description" content="编译一段代码 寄存器 栈帧 函数调用 内存对齐 结构体传参    0x00 编写一段代码12345678910111213#include &lt;stdio.h&gt;void func1(int a, int b) &amp;#123;  int sum &#x3D; a + b;  printf(&quot;The sum of %d and %d is %d\n&quot;, a, b, sum);&amp;#1">
+<meta property="og:locale">
+<meta property="og:image" content="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/stack-frame-layout-zh.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/20160508214224799">
+<meta property="article:published_time" content="2023-03-09T01:43:39.000Z">
+<meta property="article:modified_time" content="2023-03-09T16:24:26.754Z">
+<meta property="article:author" content="WuJean">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/stack-frame-layout-zh.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://wujean.github.io/2023/03/09/如此编译/"/>
+
+
+
+
+
+  <title>如此编译 | 岳麓山下你和我</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岳麓山下你和我</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">HNU CS</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://wujean.github.io/2023/03/09/%E5%A6%82%E6%AD%A4%E7%BC%96%E8%AF%91/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岳麓山下你和我">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">如此编译</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2023-03-09T09:43:39+08:00">
+                2023-03-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <ul>
+<li>编译一段代码<ul>
+<li>寄存器</li>
+<li>栈帧</li>
+<li>函数调用</li>
+<li>内存对齐</li>
+<li>结构体传参</li>
+</ul>
+</li>
+</ul>
+<h1 id="0x00-编写一段代码"><a href="#0x00-编写一段代码" class="headerlink" title="0x00 编写一段代码"></a>0x00 编写一段代码</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">void func1(int a, int b) &#123;</span><br><span class="line">  int sum = a + b;</span><br><span class="line">  printf(&quot;The sum of %d and %d is %d\n&quot;, a, b, sum);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">  int x = 3;</span><br><span class="line">  int y = 4;</span><br><span class="line">  func1(x, y);</span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们前往<a target="_blank" rel="noopener" href="https://godbolt.org/%E4%B8%AD%E6%9F%A5%E7%9C%8B%E8%AF%A5%E4%BB%A3%E7%A0%81%E7%9A%84%E6%B1%87%E7%BC%96%E5%BD%A2%E5%BC%8F">https://godbolt.org/中查看该代码的汇编形式</a></p>
+<p>也可以<code>gcc -S test.c</code>生成test.s汇编代码文件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">.LC0:</span><br><span class="line">        .string &quot;The sum of %d and %d is %d\n&quot;</span><br><span class="line">func1(int, int):</span><br><span class="line">        push    rbp</span><br><span class="line">        mov     rbp, rsp</span><br><span class="line">        sub     rsp, 32</span><br><span class="line">        mov     DWORD PTR [rbp-20], edi</span><br><span class="line">        mov     DWORD PTR [rbp-24], esi</span><br><span class="line">        mov     edx, DWORD PTR [rbp-20]</span><br><span class="line">        mov     eax, DWORD PTR [rbp-24]</span><br><span class="line">        add     eax, edx</span><br><span class="line">        mov     DWORD PTR [rbp-4], eax</span><br><span class="line">        mov     ecx, DWORD PTR [rbp-4]</span><br><span class="line">        mov     edx, DWORD PTR [rbp-24]</span><br><span class="line">        mov     eax, DWORD PTR [rbp-20]</span><br><span class="line">        mov     esi, eax</span><br><span class="line">        mov     edi, OFFSET FLAT:.LC0</span><br><span class="line">        mov     eax, 0</span><br><span class="line">        call    printf</span><br><span class="line">        nop</span><br><span class="line">        leave</span><br><span class="line">        ret</span><br><span class="line">main:</span><br><span class="line">        push    rbp</span><br><span class="line">        mov     rbp, rsp</span><br><span class="line">        sub     rsp, 16</span><br><span class="line">        mov     DWORD PTR [rbp-4], 3</span><br><span class="line">        mov     DWORD PTR [rbp-8], 4</span><br><span class="line">        mov     edx, DWORD PTR [rbp-8]</span><br><span class="line">        mov     eax, DWORD PTR [rbp-4]</span><br><span class="line">        mov     esi, edx</span><br><span class="line">        mov     edi, eax</span><br><span class="line">        call    func1(int, int)</span><br><span class="line">        mov     eax, 0</span><br><span class="line">        leave</span><br><span class="line">        ret</span><br></pre></td></tr></table></figure>
+
+<p>我们可以看到c语言代码被编译器编译成了寄存器与指令的各种操作，理解汇编层面的操作对理解计算机体系结构十分重要。</p>
+<p>让我们一起通过详解这段代码，理解计算机操作中几个重要的概念。</p>
+<h1 id="0x01-寄存器"><a href="#0x01-寄存器" class="headerlink" title="0x01 寄存器"></a>0x01 寄存器</h1><p>在x86-64架构中，有16个64位通用寄存器，分别是RAX、RBX、RCX、RDX、RSI、RDI、RBP、RSP、R8-R15。下面是每个寄存器的作用：</p>
+<p>通用寄存器：</p>
+<ul>
+<li>RAX（accumulator，累加器）：常用于存储函数返回值、算术运算、IO操作等。</li>
+<li>RBX（base，基址指针）：通常被用作指针基址，存储数据地址。</li>
+<li>RCX（counter，计数器）：通常用于循环计数器或IO端口的地址。</li>
+<li>RDX（data，数据寄存器）：通常用于存储数据，如乘法、除法、移位操作等。</li>
+<li>RSI（source index，源索引寄存器）：通常用于存储源数据地址。</li>
+<li>RDI（destination index，目的索引寄存器）：通常用于存储目标数据地址。</li>
+<li>RBP（base pointer，基址指针）：通常用于指向当前函数的基地址。</li>
+<li>RSP（stack pointer，栈指针）：通常用于指向当前栈顶。</li>
+</ul>
+<p>扩展通用寄存器：新增的通用寄存器，用于存储临时变量、指针、地址等。</p>
+<ul>
+<li>R8-R15</li>
+</ul>
+<p>指令指针寄存器：</p>
+<ul>
+<li>RIP（instruction pointer，指令指针寄存器）</li>
+</ul>
+<p>标志寄存器：</p>
+<ul>
+<li>RFLAGS（flags，标志寄存器）</li>
+</ul>
+<p>浮点寄存器：</p>
+<ul>
+<li>XMM0-XMM15（浮点寄存器）</li>
+</ul>
+<p>扩展浮点寄存器：</p>
+<ul>
+<li>YMM0-YMM15（扩展浮点寄存器）</li>
+</ul>
+<p>向量寄存器：</p>
+<ul>
+<li>ZMM0-ZMM31（向量寄存器）</li>
+</ul>
+<h1 id="0x02-栈帧"><a href="#0x02-栈帧" class="headerlink" title="0x02 栈帧"></a>0x02 栈帧</h1><p>程序的栈内存是一种特殊的内存区域，用于存储程序在运行过程中的局部变量、函数参数、返回地址和临时数据等。栈内存是由操作系统分配的一块连续的内存区域，大小通常固定，并且是在程序运行时动态分配的。</p>
+<p>栈内存的管理是由操作系统的内核完成的。在程序执行过程中，每当函数被调用时，栈内存中会创建一个新的栈帧，该栈帧会包含函数的参数、返回地址和局部变量等数据。</p>
+<p><img src="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/stack-frame-layout-zh.png" alt="栈帧与调用惯例| nullwy&#39;s blog"></p>
+<h3 id="2-1-栈帧是如何运行的"><a href="#2-1-栈帧是如何运行的" class="headerlink" title="2.1 栈帧是如何运行的"></a>2.1 栈帧是如何运行的</h3><ol>
+<li>当函数被调用时，调用指令会将函数的返回地址推入栈中，同时分配一块内存作为该函数的栈帧。</li>
+<li>函数执行期间，该函数的局部变量、参数等数据都存储在该函数的栈帧中。栈帧指针指向栈顶，用于追踪栈帧的位置。</li>
+<li>如果函数调用了其他函数，该函数的栈帧指针会被推入栈中，以便在该函数执行完毕后能够恢复之前的栈帧。</li>
+<li>当函数执行完毕时，会将栈帧指针从栈中弹出，将控制权返回到上一个栈帧中。此时，栈帧被销毁，栈帧所占用的内存空间被释放。</li>
+<li>如果程序没有更多的函数需要调用，程序将从栈中弹出最后一个栈帧，并将控制权返回到程序的入口点。</li>
+</ol>
+<p>进入栈帧和退出栈帧时，栈帧指针的值会改变。当进入栈帧时，栈帧指针的值会指向分配给该函数的内存区域的顶部。当退出栈帧时，栈帧指针的值会指向上一个栈帧的顶部。由于栈的后进先出（LIFO）特性，每次进入和退出栈帧时，栈帧指针的值都会按照相反的顺序改变。</p>
+<p><strong>请注意栈中存储的是数据（包括局部变量和地址）而不是指令</strong></p>
+<h3 id="2-2-栈帧的大小"><a href="#2-2-栈帧的大小" class="headerlink" title="2.2 栈帧的大小"></a>2.2 栈帧的大小</h3><p><strong>栈帧的大小取决于函数使用的局部变量和参数的数量和类型。</strong></p>
+<p>栈帧的大小是在编译器编译过程中就已经确定的，编译器会根据函数的局部变量、参数、返回地址等信息来计算栈帧的大小。</p>
+<p>在函数被调用时，操作系统会为该函数的栈帧分配一块连续的内存空间，并将该栈帧的大小与栈指针相加，指向新的栈帧起始位置。在函数执行过程中，栈指针会随着栈帧中的局部变量和其他数据的压栈和出栈而不断地变化。当函数执行完毕时，栈帧会被销毁，栈指针会回到上一个栈帧的位置。</p>
+<h1 id="0x03-函数调用"><a href="#0x03-函数调用" class="headerlink" title="0x03 函数调用"></a>0x03 函数调用</h1><p>在汇编语言中，函数调用是通过一系列的指令来完成的。以下是一个基本的汇编层面的函数调用过程：</p>
+<ol>
+<li>将函数的参数传递到寄存器中。通常情况下，函数的参数被存储在栈中，然后被加载到寄存器中。</li>
+<li>调用函数。在x86体系结构中，函数调用使用CALL指令来实现，该指令会将当前程序计数器（PC）的值（即函数的返回地址）压入栈中，并将程序跳转到被调用函数的入口地址。</li>
+<li>在被调用函数中，首先保存调用者保存的寄存器的值。为了防止调用者和被调用者之间的寄存器值冲突，被调用函数需要在开始时保存这些寄存器的值。这些寄存器的值在函数结束时需要恢复。</li>
+<li>在被调用函数中，为局部变量分配空间。函数中的局部变量通常会被存储在栈中。</li>
+<li>在被调用函数中，执行函数体代码。</li>
+<li>在被调用函数中，将结果返回给调用者。在x86体系结构中，使用RET指令来实现函数的返回。RET指令会弹出栈中的返回地址，并将程序跳转到该地址。</li>
+<li>在返回到调用者之前，被调用函数需要恢复调用者保存的寄存器的值。</li>
+</ol>
+<h2 id="3-1-函数传参"><a href="#3-1-函数传参" class="headerlink" title="3.1 函数传参"></a>3.1 函数传参</h2><p>函数传参是指在函数调用时将实参（也称为实际参数）传递给函数的形参（也称为形式参数）。在C语言中，函数传参通常有以下几种方式：</p>
+<ol>
+<li>值传递：将实参的值复制一份传递给函数的形参。在函数内部修改形参的值不会影响实参的值。</li>
+<li>指针传递：将实参的地址传递给函数的形参。在函数内部通过指针访问实参，可以修改实参的值。</li>
+<li>数组传递：将数组名传递给函数的形参，函数可以通过数组名访问数组元素，也可以通过指针方式访问数组元素。</li>
+<li>结构体传递：将结构体变量传递给函数的形参，可以通过结构体变量的成员访问结构体的元素。</li>
+</ol>
+<p>需要注意的是，函数传参的方式不同，对应的内存开销和性能消耗也不同。在实际编程中，应该根据实际需要选择适当的传参方式，以达到最优的程序性能和内存占用。</p>
+<h3 id="3-1-1-寄存器传参"><a href="#3-1-1-寄存器传参" class="headerlink" title="3.1.1 寄存器传参"></a>3.1.1 寄存器传参</h3><p>x86-64使用了六个寄存器用于传递参数：</p>
+<p><img src="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/20160508214224799" alt="img"></p>
+<h4 id="示例代码"><a href="#示例代码" class="headerlink" title="示例代码"></a>示例代码</h4><p>此处给出一段示例代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line"> int x = 3;</span><br><span class="line"> int y = 4;</span><br><span class="line"> printf(&quot;x:%d.y:%d&quot;,x,y);</span><br><span class="line"> return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">.LC0:</span><br><span class="line">   .string &quot;x:%d.y:%d&quot;</span><br><span class="line">main:</span><br><span class="line">    push  rbp</span><br><span class="line">    mov   rbp, rsp</span><br><span class="line">    sub   rsp, 16</span><br><span class="line">    mov   DWORD PTR [rbp-4], 3</span><br><span class="line">    mov   DWORD PTR [rbp-8], 4</span><br><span class="line">    mov   edx, DWORD PTR [rbp-8]</span><br><span class="line">    mov   eax, DWORD PTR [rbp-4]</span><br><span class="line">    mov   esi, eax</span><br><span class="line">    mov   edi, OFFSET FLAT:.LC0</span><br><span class="line">    mov   eax, 0</span><br><span class="line">    call  printf</span><br><span class="line">    mov   eax, 0</span><br><span class="line">    leave</span><br><span class="line">    ret</span><br></pre></td></tr></table></figure>
+
+<p>我们可以注意到在<code>call printf</code>之前编译器对寄存器中的值进行了一系列操作</p>
+<p>我们给出printf函数的原型来探究一下这些操作的意义：</p>
+<h4 id="printf函数"><a href="#printf函数" class="headerlink" title="printf函数"></a>printf函数</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">printf(const char *format, ...);</span><br></pre></td></tr></table></figure>
+
+<p>其中，第一个参数是格式控制字符串（format string），用于指定输出格式，第二个参数是可变参数（variable argument），用于传递输出的数据。函数返回值为输出的字符数，如果出现错误，则返回负值。</p>
+<p>具体来说，格式控制字符串由普通字符和转换说明符（conversion specifier）组成，转换说明符以百分号（%）开头，用于指定输出数据的类型和格式。例如，%d用于输出十进制整数，%s用于输出字符串，%f用于输出浮点数等等。</p>
+<p>可变参数使用省略号（…）来表示，它可以传递任意个数、任意类型的参数。在函数内部，可以使用stdarg.h头文件中定义的宏和函数来访问这些可变参数，常用的有va_start、va_arg和va_end函数。</p>
+<blockquote>
+<p>需要注意的是，printf函数在输出时会根据格式控制字符串的指示将数据转换成字符串输出到标准输出设备（通常是终端或者控制台窗口），因此需要保证输出的数据类型与格式控制字符串中指定的类型匹配，否则可能会出现不可预期的错误或者程序崩溃。</p>
+</blockquote>
+<p><strong>引用内容将在结构体传参中详解</strong></p>
+<p>我们可以看到printf函数接收一系列参数，在示例代码中</p>
+<p>第一行定义了一个标签.LC0，.string表示将接下来的字符串作为常量存储在内存中，并用标签.LC0标记。</p>
+<p><code>mov   edi, OFFSET FLAT:.LC0</code>将eax寄存器的值（即3）移动到esi寄存器中，将.LC0的地址（即字符串”x:%d.y:%d”的地址）移动到edi寄存器中，作为函数的第一个参数</p>
+<p>对照上面给出的寄存器与函数参数的对应表，我们注意到：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mov   DWORD PTR [rbp-4], 3		//x = 3</span><br><span class="line">mov   DWORD PTR [rbp-8], 4		//y = 4</span><br><span class="line">mov   edx, DWORD PTR [rbp-8]		//将y传递给第三个参数寄存器edx</span><br><span class="line">mov   eax, DWORD PTR [rbp-4]		//将x传递给寄存器eax</span><br><span class="line">mov   esi, eax						//将存储在eax中的x的值传递给第二个参数寄存器</span><br></pre></td></tr></table></figure>
+
+<p>故在调用printf时可以直接从参数寄存器中取值，提高了运行的效率。</p>
+<h3 id="3-1-2-栈传参"><a href="#3-1-2-栈传参" class="headerlink" title="3.1.2 栈传参"></a>3.1.2 栈传参</h3><p>当我们使用的参数多于六个的时候，函数传参将会回归最原始的调用方式——栈传参</p>
+<p>当一个函数被调用时，它的参数会被压入栈中，然后被函数调用代码弹出并使用。下面是一些常见的栈传参的操作：</p>
+<ol>
+<li>将参数依次压入栈中：在调用函数之前，将所有的参数按照<strong>从右往左的顺序</strong>依次压入栈中。例如，当函数调用f(a, b, c)时，参数c会先被压入栈中，接着是b，最后是a。在函数调用过程中，栈指针会指向最后一个参数的位置。</li>
+<li>传递指针或引用类型的参数：当参数是指针或引用类型时，实际上传递的是指针或引用的地址。在调用函数之前，将指针或引用的地址压入栈中，函数调用代码会根据该地址获取实际的参数值。</li>
+<li>处理不同类型的参数：在将参数压入栈中之前，需要根据参数的类型进行相应的转换。例如，将浮点型参数转换为IEEE 754标准的二进制格式，并按照指定的字节顺序压入栈中。</li>
+</ol>
+<h4 id="示例代码-1"><a href="#示例代码-1" class="headerlink" title="示例代码"></a>示例代码</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">  int a = 1;</span><br><span class="line">  int b = 2;</span><br><span class="line">  int c = 3;</span><br><span class="line">  int d = 4;</span><br><span class="line">  int e = 5;</span><br><span class="line">  int f = 6;</span><br><span class="line">  int g = 7;</span><br><span class="line">  int h = 8;</span><br><span class="line">  printf(&quot;a:%d,b:%d,c:%d,d:%d,e:%d,f:%d,g:%d,g:%d,&quot;,a,b,c,d,e,f,g,h);</span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">.LC0:</span><br><span class="line">        .string &quot;a:%d,b:%d,c:%d,d:%d,e:%d,f:%d,g:%d,g:%d,&quot;</span><br><span class="line">main:</span><br><span class="line">        push    rbp</span><br><span class="line">        mov     rbp, rsp</span><br><span class="line">        sub     rsp, 32</span><br><span class="line">        mov     DWORD PTR [rbp-4], 1</span><br><span class="line">        mov     DWORD PTR [rbp-8], 2</span><br><span class="line">        mov     DWORD PTR [rbp-12], 3</span><br><span class="line">        mov     DWORD PTR [rbp-16], 4</span><br><span class="line">        mov     DWORD PTR [rbp-20], 5</span><br><span class="line">        mov     DWORD PTR [rbp-24], 6</span><br><span class="line">        mov     DWORD PTR [rbp-28], 7</span><br><span class="line">        mov     DWORD PTR [rbp-32], 8</span><br><span class="line">        mov     r8d, DWORD PTR [rbp-20]</span><br><span class="line">        mov     edi, DWORD PTR [rbp-16]</span><br><span class="line">        mov     ecx, DWORD PTR [rbp-12]</span><br><span class="line">        mov     edx, DWORD PTR [rbp-8]</span><br><span class="line">        mov     eax, DWORD PTR [rbp-4]</span><br><span class="line">        sub     rsp, 8</span><br><span class="line">        mov     esi, DWORD PTR [rbp-32]</span><br><span class="line">        push    rsi</span><br><span class="line">        mov     esi, DWORD PTR [rbp-28]</span><br><span class="line">        push    rsi</span><br><span class="line">        mov     esi, DWORD PTR [rbp-24]</span><br><span class="line">        push    rsi</span><br><span class="line">        mov     r9d, r8d</span><br><span class="line">        mov     r8d, edi</span><br><span class="line">        mov     esi, eax</span><br><span class="line">        mov     edi, OFFSET FLAT:.LC0</span><br><span class="line">        mov     eax, 0</span><br><span class="line">        call    printf</span><br><span class="line">        add     rsp, 32</span><br><span class="line">        mov     eax, 0</span><br><span class="line">        leave</span><br><span class="line">        ret</span><br></pre></td></tr></table></figure>
+
+<p>我们注意到这一段汇编代码的操作：</p>
+<pre><code>    mov     DWORD PTR [rbp-20], 5
+    mov     DWORD PTR [rbp-24], 6
+    mov     DWORD PTR [rbp-28], 7
+    mov     DWORD PTR [rbp-32], 8
+    mov     r8d, DWORD PTR [rbp-20]		//第五个参数
+    mov     edi, DWORD PTR [rbp-16]
+    mov     ecx, DWORD PTR [rbp-12]
+    mov     edx, DWORD PTR [rbp-8]
+    mov     eax, DWORD PTR [rbp-4]
+    sub     rsp, 8						//分配8位的栈内存
+    mov     esi, DWORD PTR [rbp-32]		//将最后一个参数放入寄存器esi中
+    push    rsi							//(esi为rsi的低32位)将rsi入栈
+    mov     esi, DWORD PTR [rbp-28]		//重复操作
+    push    rsi
+    mov     esi, DWORD PTR [rbp-24]
+    push    rsi
+</code></pre>
+<p>从源代码我们可以看出printf函数一共接受1(字符串)+8(变量)&#x3D;9个参数，超过了参数寄存器的个数，多余的参数将按照从右到左的顺序放入栈中，于是就有了入栈的操作。</p>
+<blockquote>
+<p>在x86-64架构中，寄存器是64位的，但栈是32位的。当使用mov指令将一个32位的值从内存加载到寄存器中时，通常使用32位通用寄存器，如eax、ebx、ecx、edx等。在将数据压入栈中时，可以使用任何寄存器，因为它们的值最终都将被推送到栈中。</p>
+</blockquote>
+<h4 id="栈传参和寄存器传参的差别"><a href="#栈传参和寄存器传参的差别" class="headerlink" title="栈传参和寄存器传参的差别"></a>栈传参和寄存器传参的差别</h4><p>将栈上的数据放到寄存器中再传参相对于直接取栈上的数据传参可能会更快，因为寄存器是CPU内部的高速存储器，访问速度比内存要快得多。而栈作为内存的一部分，访问速度相对较慢。</p>
+<p>在将栈上的数据放到寄存器中再传参的情况下，由于数据已经被预先加载到寄存器中，函数执行时无需再次从内存中读取数据，因此可以节省一定的访问时间和带宽消耗。</p>
+<h2 id="3-2-结构体传参"><a href="#3-2-结构体传参" class="headerlink" title="3.2 结构体传参"></a>3.2 结构体传参</h2><h2 id="3-3-不定参数传参"><a href="#3-3-不定参数传参" class="headerlink" title="3.3 不定参数传参"></a>3.3 不定参数传参</h2><h1 id="0x04-内存对齐"><a href="#0x04-内存对齐" class="headerlink" title="0x04 内存对齐"></a>0x04 内存对齐</h1><p>C语言编译器中的内存对齐是为了优化内存访问，以提高程序的执行效率。在C语言中，变量的内存对齐是由编译器进行控制的，可以通过指定对齐方式来实现。</p>
+<p>C语言中的内存对齐规则有以下几个方面：</p>
+<ol>
+<li>数据类型的对齐方式：不同的数据类型有不同的对齐方式。例如，char类型的对齐方式是1字节，int类型的对齐方式是4字节，double类型的对齐方式是8字节等。</li>
+<li>结构体的对齐方式：结构体中的变量通常按照其自身的对齐方式进行对齐，但是结构体本身也需要进行对齐。结构体的对齐方式一般是以最宽基本数据类型的大小为基准进行对齐，例如在32位系统中，结构体中的成员变量按照4字节对齐。</li>
+<li>指针的对齐方式：指针的对齐方式通常和其所指向的数据类型的对齐方式一致。</li>
+</ol>
+<p>C语言编译器中可以通过使用特殊的编译指令来控制内存对齐方式，如#pragma pack(n)指令可以设置对齐方式为n字节，<strong>attribute</strong>((aligned(n)))指令可以指定变量的对齐方式为n字节。在不同的编译器中，内存对齐方式可能有所不同，因此需要根据具体的编译器来进行设置。</p>
+<h2 id="4-1-为什么内存对齐能提高运行速度"><a href="#4-1-为什么内存对齐能提高运行速度" class="headerlink" title="4.1 为什么内存对齐能提高运行速度"></a>4.1 为什么内存对齐能提高运行速度</h2><p>内存对齐能提高执行效率的原因主要是因为它能减少内存访问的次数。</p>
+<p>当内存中的变量未对齐时，访问这些变量会导致额外的访问次数。</p>
+<p>例如，如果一个4字节的整数未对齐存储在一个地址为3的位置，那么当CPU访问该变量时，需要先读取地址为3的字节，再读取地址为4、5和6的字节，最后组合这些字节来得到这个整数的值。这样的访问过程需要花费额外的时间和计算资源，从而导致程序执行效率降低。</p>
+<p>而当内存中的变量按照对齐规则进行存储时，CPU能够直接访问变量所在的地址，从而减少访问次数，提高程序的执行效率。</p>
+<p>此外，内存对齐还能优化缓存的使用。现代计算机通常使用缓存来加速内存访问，缓存通常以块的形式进行管理。当内存中的变量未对齐时，可能会导致多个变量存储在同一个缓存块中，从而导致缓存失效率降低。而当变量按照对齐规则存储时，能够保证每个变量占据整数个缓存块，从而最大化缓存的使用效率，提高程序的执行效率。</p>
+<p>综上所述，内存对齐能够减少内存访问次数和优化缓存使用，从而提高程序的执行效率。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2023/03/04/Begin-your-Blog/" rel="next" title="Begin your Blog">
+                <i class="fa fa-chevron-left"></i> Begin your Blog
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2023/03/09/GDB/" rel="prev" title="GDB">
+                GDB <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="" />
+            
+              <p class="site-author-name" itemprop="name"></p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x00-%E7%BC%96%E5%86%99%E4%B8%80%E6%AE%B5%E4%BB%A3%E7%A0%81"><span class="nav-number">1.</span> <span class="nav-text">0x00 编写一段代码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01-%E5%AF%84%E5%AD%98%E5%99%A8"><span class="nav-number">2.</span> <span class="nav-text">0x01 寄存器</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x02-%E6%A0%88%E5%B8%A7"><span class="nav-number">3.</span> <span class="nav-text">0x02 栈帧</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E6%A0%88%E5%B8%A7%E6%98%AF%E5%A6%82%E4%BD%95%E8%BF%90%E8%A1%8C%E7%9A%84"><span class="nav-number">3.0.1.</span> <span class="nav-text">2.1 栈帧是如何运行的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E6%A0%88%E5%B8%A7%E7%9A%84%E5%A4%A7%E5%B0%8F"><span class="nav-number">3.0.2.</span> <span class="nav-text">2.2 栈帧的大小</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x03-%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">0x03 函数调用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-%E5%87%BD%E6%95%B0%E4%BC%A0%E5%8F%82"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 函数传参</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-1-%E5%AF%84%E5%AD%98%E5%99%A8%E4%BC%A0%E5%8F%82"><span class="nav-number">4.1.1.</span> <span class="nav-text">3.1.1 寄存器传参</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E4%BB%A3%E7%A0%81"><span class="nav-number">4.1.1.1.</span> <span class="nav-text">示例代码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#printf%E5%87%BD%E6%95%B0"><span class="nav-number">4.1.1.2.</span> <span class="nav-text">printf函数</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-2-%E6%A0%88%E4%BC%A0%E5%8F%82"><span class="nav-number">4.1.2.</span> <span class="nav-text">3.1.2 栈传参</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E4%BB%A3%E7%A0%81-1"><span class="nav-number">4.1.2.1.</span> <span class="nav-text">示例代码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%88%E4%BC%A0%E5%8F%82%E5%92%8C%E5%AF%84%E5%AD%98%E5%99%A8%E4%BC%A0%E5%8F%82%E7%9A%84%E5%B7%AE%E5%88%AB"><span class="nav-number">4.1.2.2.</span> <span class="nav-text">栈传参和寄存器传参的差别</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-%E7%BB%93%E6%9E%84%E4%BD%93%E4%BC%A0%E5%8F%82"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 结构体传参</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3-%E4%B8%8D%E5%AE%9A%E5%8F%82%E6%95%B0%E4%BC%A0%E5%8F%82"><span class="nav-number">4.3.</span> <span class="nav-text">3.3 不定参数传参</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x04-%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90"><span class="nav-number">5.</span> <span class="nav-text">0x04 内存对齐</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-%E4%B8%BA%E4%BB%80%E4%B9%88%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90%E8%83%BD%E6%8F%90%E9%AB%98%E8%BF%90%E8%A1%8C%E9%80%9F%E5%BA%A6"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 为什么内存对齐能提高运行速度</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">WuJean</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
