@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Blog," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="0x00 为什么要写博客学了很多东西，中断一段时间的学习后总觉得啥都忘掉了；折腾了很多东西，但再次折腾的时候总是要重新找教程；踩过很多坑，但是再次遇到的时候总要重新踩一般；做过什么事情，别人问的时候还得翻历史记录找链接。 如果你有遇到过以上的这些问题，那么你就该开始写博客了。诚然在写博客中会遇到很多的问题，在看完别人很好的技术文章后想自己总结一遍，但总觉得是在照抄别人的东西；自己搭建博客的时候会遇">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Begin your Blog">
+<meta property="og:url" content="http://wujean.github.io/2023/03/04/Begin-your-Blog/index.html">
+<meta property="og:site_name" content="岳麓山下你和我">
+<meta property="og:description" content="0x00 为什么要写博客学了很多东西，中断一段时间的学习后总觉得啥都忘掉了；折腾了很多东西，但再次折腾的时候总是要重新找教程；踩过很多坑，但是再次遇到的时候总要重新踩一般；做过什么事情，别人问的时候还得翻历史记录找链接。 如果你有遇到过以上的这些问题，那么你就该开始写博客了。诚然在写博客中会遇到很多的问题，在看完别人很好的技术文章后想自己总结一遍，但总觉得是在照抄别人的东西；自己搭建博客的时候会遇">
+<meta property="og:locale">
+<meta property="og:image" content="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230304101702336.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230304101837180.png">
+<meta property="og:image" content="https://files.gitbook.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F1AHCozuJqdGsaIacfQwK%2Fuploads%2F6r9XErDPUeAR03LTJtWO%2Fimage.png?alt=media&token=03ee0429-77a5-476a-a676-ee4274b78453">
+<meta property="og:image" content="https://files.gitbook.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F1AHCozuJqdGsaIacfQwK%2Fuploads%2FBjdJIPIbcrBDFfStreOd%2Fimage.png?alt=media&token=2b6984bf-6923-415e-ad82-713f45268f37">
+<meta property="og:image" content="https://files.gitbook.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F1AHCozuJqdGsaIacfQwK%2Fuploads%2FtkkA5oCVxx3aDmTJbQzP%2Fimage.png?alt=media&token=3900ee84-7f77-4a5a-87af-094a06dfd874">
+<meta property="og:image" content="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230304102134819.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2350558a10d94c8ab4959b04771d2bcc.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3lhb3JvbmdrZQ==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230304102636388.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230304103846611.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230304104244994.png">
+<meta property="og:image" content="https://pic2.zhimg.com/80/v2-346da4ccf189eb5997abe2fadadca331_720w.webp">
+<meta property="og:image" content="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230309093148974.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230309093340529.png">
+<meta property="article:published_time" content="2023-03-04T01:34:04.000Z">
+<meta property="article:modified_time" content="2023-03-09T01:38:06.036Z">
+<meta property="article:author" content="WuJean">
+<meta property="article:tag" content="Blog">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230304101702336.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://wujean.github.io/2023/03/04/Begin-your-Blog/"/>
+
+
+
+
+
+  <title>Begin your Blog | 岳麓山下你和我</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岳麓山下你和我</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">HNU CS</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://wujean.github.io/2023/03/04/Begin-your-Blog/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岳麓山下你和我">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Begin your Blog</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2023-03-04T09:34:04+08:00">
+                2023-03-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="0x00-为什么要写博客"><a href="#0x00-为什么要写博客" class="headerlink" title="0x00 为什么要写博客"></a>0x00 为什么要写博客</h1><p>学了很多东西，中断一段时间的学习后总觉得啥都忘掉了；折腾了很多东西，但再次折腾的时候总是要重新找教程；踩过很多坑，但是再次遇到的时候总要重新踩一般；做过什么事情，别人问的时候还得翻历史记录找链接。</p>
+<p>如果你有遇到过以上的这些问题，那么你就该开始写博客了。诚然在写博客中会遇到很多的问题，在看完别人很好的技术文章后想自己总结一遍，但总觉得是在照抄别人的东西；自己搭建博客的时候会遇到许多问题，耗费很多的时间和精力；总是坚持不下去写博客，三分钟热度。但是这个折腾和总结的过程正是我们搭建自己的知识框架的过程，看过的文章再好，动动小手copy的时候也会发现很多忽略的细节，完成这样一个写的过程往往更能体会到作者的深意，缕清行文的思路；折腾得越久，投入得 时间越多，也会更想把自己得博客经营好；当别人问你问题的时候甩上自己文章得链接，岂不美哉！</p>
+<h1 id="0x01-选择博客框架"><a href="#0x01-选择博客框架" class="headerlink" title="0x01 选择博客框架"></a>0x01 选择博客框架</h1><p>我从大一接触到云服务开始，使用了很多种博客框架，其中最方便得就是云服务器上基于宝塔面板的Wordpress框架，使用方便而且容易配置域名放在公网访问，但是要进行备案以及内容审查，面临着域名、服务器过期等问题。</p>
+<p>后来又尝试了Hexo+githubpage的框架，体验非常好，无需备案，高度的可定制性，网上教程资源多，但是对刚刚入门的同学操作会有点难度。</p>
+<p>最近在新买的homelab上搭建了内网的基于ubuntu docker的wordpress，配置了frp转发访问，折腾完觉得索然无味，于是便决定回归Hexo。折腾那么久后才觉得博客的本质在于文章而不在于框架，框架简单易用、能为写文章提供最大的便利即可。</p>
+<p>本文记录了基于github page搭建Hexo博客，通过PicGo+github搭建图床，使用Typora+PicGo编辑文章 的工作流的流程。发布文章便捷，博客访问方便，且不用但心审查和过期。</p>
+<h1 id="0x02-搭建Hexo博客"><a href="#0x02-搭建Hexo博客" class="headerlink" title="0x02 搭建Hexo博客"></a>0x02 搭建Hexo博客</h1><h2 id="2-1-准备工作"><a href="#2-1-准备工作" class="headerlink" title="2.1 准备工作"></a>2.1 准备工作</h2><ul>
+<li>github账号</li>
+</ul>
+<p>在github中新建仓库，仓库名为yourusername.github.io,在setting中找到github page并配置publish</p>
+<p><img src="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230304101702336.png" alt="image-20230304101702336"></p>
+<ul>
+<li><p>安装好Git</p>
+</li>
+<li><p>安装好NodeJs</p>
+</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230304101837180.png" alt="image-20230304101837180"></p>
+<h3 id="add-ssh-key"><a href="#add-ssh-key" class="headerlink" title="add ssh key"></a>add ssh key</h3><p>可以使用 SSH（安全外壳协议）访问和写入 上的存储库中的数据。 通过 SSH 进行连接时，使用本地计算机上的私钥文件进行身份验证。 有关详细信息，请参阅“<a target="_blank" rel="noopener" href="https://docs.github.com/zh/authentication/connecting-to-github-with-ssh/about-ssh">关于 SSH</a>”。</p>
+<p>生成 SSH 密钥对后，必须将公钥添加到 以启用帐户的 SSH 访问。</p>
+<p>打开命令行并输入：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa -C &#x27;your_email@example.com&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>生成你的密钥。</p>
+<p><img src="https://files.gitbook.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F1AHCozuJqdGsaIacfQwK%2Fuploads%2F6r9XErDPUeAR03LTJtWO%2Fimage.png?alt=media&token=03ee0429-77a5-476a-a676-ee4274b78453" alt="img"></p>
+<p>可以看到你的密钥保存在&#x2F;home&#x2F;your_name&#x2F;.ssh下，打开该文件夹并复制刚刚生成id_rsa.pub中的内容</p>
+<p>随后打开你的github setting在ssh keys处添加你的公钥，完成添加。</p>
+<p><img src="https://files.gitbook.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F1AHCozuJqdGsaIacfQwK%2Fuploads%2FBjdJIPIbcrBDFfStreOd%2Fimage.png?alt=media&token=2b6984bf-6923-415e-ad82-713f45268f37" alt="img"></p>
+<p>最后建立一下ssh连接确认是否成功。输入：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh -T git@github.com</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://files.gitbook.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F1AHCozuJqdGsaIacfQwK%2Fuploads%2FtkkA5oCVxx3aDmTJbQzP%2Fimage.png?alt=media&token=3900ee84-7f77-4a5a-87af-094a06dfd874" alt="img"></p>
+<h2 id="2-2-安装Hexo"><a href="#2-2-安装Hexo" class="headerlink" title="2.2 安装Hexo"></a>2.2 安装Hexo</h2><p>我们采用<code>Hexo</code>来创建我们的博客网站，<code>Hexo</code> 是一个基于<code>NodeJS</code>的静态博客网站生成器，使用<code>Hexo</code>不需开发，只要进行一些必要的配置即可生成一个个性化的博客网站，非常方便。点击进入 <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/">官网</a>。</p>
+<p>安装 Hexo</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install -g hexo-cli</span><br></pre></td></tr></table></figure>
+
+<p>查看版本</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo -v</span><br></pre></td></tr></table></figure>
+
+<p>创建一个项目 hexo-blog 并初始化</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo init hexo-blog</span><br><span class="line">cd hexo-blog</span><br><span class="line">npm install</span><br></pre></td></tr></table></figure>
+
+<p>本地启动</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hexo </span><br><span class="line">hexo server</span><br></pre></td></tr></table></figure>
+
+<p>启动后的页面如图所示，我们可以在本地预览博客</p>
+<p><img src="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230304102134819.png" alt="image-20230304102134819"></p>
+<h2 id="2-3-将博客推送到github-page"><a href="#2-3-将博客推送到github-page" class="headerlink" title="2.3 将博客推送到github page"></a>2.3 将博客推送到github page</h2><p>安装hexo-deployer-git</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure>
+
+<p>修改<strong>根目录</strong>下的 _config.yml，配置 GitHub 相关信息</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">deploy:</span><br><span class="line">  type: git</span><br><span class="line">  repo: your repo address</span><br><span class="line">  branch: main</span><br><span class="line">  token: your token</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/2350558a10d94c8ab4959b04771d2bcc.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3lhb3JvbmdrZQ==,size_16,color_FFFFFF,t_70" alt="请添加图片描述"></p>
+<p>执行生成博客并推送到远程的命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo g -d</span><br></pre></td></tr></table></figure>
+
+<p>浏览器访问 <a target="_blank" rel="noopener" href="https://yourunsername.github.io/">https://yourunsername.github.io</a>, 部署成功</p>
+<p><img src="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230304102636388.png" alt="image-20230304102636388"></p>
+<h2 id="2-4-Hexo-命令"><a href="#2-4-Hexo-命令" class="headerlink" title="2.4 Hexo 命令"></a>2.4 Hexo 命令</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">hexo n &quot;标题&quot;			//生成文章并存储到source/_posts</span><br><span class="line">hexo g 				//生成博客页面</span><br><span class="line">hexo s 				//本地预览文章</span><br><span class="line">hexo d				//推送文章到github page</span><br></pre></td></tr></table></figure>
+
+<p>使用简单的命令就可以完成博客的生成和部署，注意在未添加ssh key时使用hexo d会出现权限不够无法推送的问题，请务必为本机添加ssh key。</p>
+<h2 id="2-5-修改Hexo主题"><a href="#2-5-修改Hexo主题" class="headerlink" title="2.5 修改Hexo主题"></a>2.5 修改Hexo主题</h2><p>使用Next主题</p>
+<p>将主题的源码放入blog文件夹中的themes文件夹</p>
+<p><img src="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230304103846611.png" alt="image-20230304103846611"></p>
+<p>修改blog文件夹中的_config.yml文件,将主题修改成对应的主题名称</p>
+<p><img src="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230304104244994.png" alt="image-20230304104244994"></p>
+<p>重新生成并部署博客</p>
+<h2 id="2-6-小结"><a href="#2-6-小结" class="headerlink" title="2.6 小结"></a>2.6 小结</h2><p>至此博客的部署全部完成，读者可以自己搜索相关配置文章，分别修改博客目录和主题目录下的_config.yml文件，注意要区分博客目录和主题目录！添加插件各种魔改来完善自己的博客。反正我是不折腾了。</p>
+<h1 id="0x03-PicGo搭建图床"><a href="#0x03-PicGo搭建图床" class="headerlink" title="0x03 PicGo搭建图床"></a>0x03 PicGo搭建图床</h1><p>博客文章的图片需要找个地方存放，全部存放在本地占用过大，引用别人的图片说不定哪一天就挂了；于是决定白嫖github的存储空间，毕竟能访问github page的也应该得能访问github</p>
+<h2 id="3-1-配置github"><a href="#3-1-配置github" class="headerlink" title="3.1 配置github"></a>3.1 配置github</h2><p>创建一个新的公共仓库，并获取github的access tokens</p>
+<p><img src="https://pic2.zhimg.com/80/v2-346da4ccf189eb5997abe2fadadca331_720w.webp" alt="img"></p>
+<p>将获取的token保存起来</p>
+<h2 id="3-2-配置PicGo"><a href="#3-2-配置PicGo" class="headerlink" title="3.2 配置PicGo"></a>3.2 配置PicGo</h2><p><a target="_blank" rel="noopener" href="https://github.com/Molunerfinn/PicG">https://github.com/Molunerfinn/PicG</a> 下载PicGo并打开</p>
+<p><img src="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230309093148974.png" alt="image-20230309093148974"></p>
+<ul>
+<li><p>输入你设定的仓库名（注意斜杆前后无空格）</p>
+</li>
+<li><p>将分支修改为main</p>
+</li>
+<li><p>将上一步得到的token输入进去</p>
+</li>
+</ul>
+<p>若未开启代理则有可能无法访问github，故我们在设置里面设置一下代理</p>
+<p><img src="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230309093340529.png" alt="image-20230309093340529"></p>
+<p>随意上传一张图片，上传成功则配置成功！</p>
+<h1 id="0x04-配置Typora-PicGo工作流"><a href="#0x04-配置Typora-PicGo工作流" class="headerlink" title="0x04 配置Typora+PicGo工作流"></a>0x04 配置Typora+PicGo工作流</h1>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Blog/" rel="tag"># Blog</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2023/03/02/hello-world/" rel="next" title="Hello World">
+                <i class="fa fa-chevron-left"></i> Hello World
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="" />
+            
+              <p class="site-author-name" itemprop="name"></p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x00-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%86%99%E5%8D%9A%E5%AE%A2"><span class="nav-number">1.</span> <span class="nav-text">0x00 为什么要写博客</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01-%E9%80%89%E6%8B%A9%E5%8D%9A%E5%AE%A2%E6%A1%86%E6%9E%B6"><span class="nav-number">2.</span> <span class="nav-text">0x01 选择博客框架</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x02-%E6%90%AD%E5%BB%BAHexo%E5%8D%9A%E5%AE%A2"><span class="nav-number">3.</span> <span class="nav-text">0x02 搭建Hexo博客</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 准备工作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#add-ssh-key"><span class="nav-number">3.1.1.</span> <span class="nav-text">add ssh key</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-%E5%AE%89%E8%A3%85Hexo"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 安装Hexo</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-%E5%B0%86%E5%8D%9A%E5%AE%A2%E6%8E%A8%E9%80%81%E5%88%B0github-page"><span class="nav-number">3.3.</span> <span class="nav-text">2.3 将博客推送到github page</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-Hexo-%E5%91%BD%E4%BB%A4"><span class="nav-number">3.4.</span> <span class="nav-text">2.4 Hexo 命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-5-%E4%BF%AE%E6%94%B9Hexo%E4%B8%BB%E9%A2%98"><span class="nav-number">3.5.</span> <span class="nav-text">2.5 修改Hexo主题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-6-%E5%B0%8F%E7%BB%93"><span class="nav-number">3.6.</span> <span class="nav-text">2.6 小结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x03-PicGo%E6%90%AD%E5%BB%BA%E5%9B%BE%E5%BA%8A"><span class="nav-number">4.</span> <span class="nav-text">0x03 PicGo搭建图床</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-%E9%85%8D%E7%BD%AEgithub"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 配置github</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-%E9%85%8D%E7%BD%AEPicGo"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 配置PicGo</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x04-%E9%85%8D%E7%BD%AETypora-PicGo%E5%B7%A5%E4%BD%9C%E6%B5%81"><span class="nav-number">5.</span> <span class="nav-text">0x04 配置Typora+PicGo工作流</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">WuJean</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
