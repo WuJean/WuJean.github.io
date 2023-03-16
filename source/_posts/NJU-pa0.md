@@ -2,7 +2,7 @@
 title: NJU-pa0-配置环境
 date: 2023-03-14 20:15:12
 updated:
-tags:
+tags: NJU-pa
 categories:
 keywords:
 description:
