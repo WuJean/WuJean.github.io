@@ -1,6 +1,6 @@
 ---
 title: {{title}}
-date: {{date}}title:
+date: {{date}}
 updated:
 type:
 comments:
