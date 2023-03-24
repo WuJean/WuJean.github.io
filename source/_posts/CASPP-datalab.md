@@ -13,11 +13,58 @@ cover:
 
 # 配置
 
+实验环境为：
+
+- WSL2 ubuntu22.04 64位
+- i5-12400
+
 # Begin
+
+从该仓库拉取datalab
+
+```
+git clone https://github.com/WuJean/HNU-CSAPP.git
+```
+
+按照要求在lab目录下make btest，编译测试程序
+
+如遇到编译错误可能是缺少在64位下运行32位的相关包，apt获取后再次make即可
+
+做完每题后用 ./dlc 查看使用符号是否符合规范，再次make后执行 ./btest查看分数
 
 ## bitAnd
 
+```
+/* 
+ * bitAnd - x&y using only ~ and | 
+ *   Example: bitAnd(6, 5) = 4
+ *   Legal ops: ~ |
+ *   Max ops: 8
+ *   Rating: 1
+ */
+int bitAnd(int x, int y) {
+  return ~((~x)|(~y));
+}
+```
+
 ## getByte
+
+```
+/* 
+ * getByte - Extract byte n from word x
+ *   Bytes numbered from 0 (LSB) to 3 (MSB)
+ *   Examples: getByte(0x12345678,1) = 0x56
+ *   Legal ops: ! ~ & ^ | + << >>
+ *   Max ops: 6
+ *   Rating: 2
+ */
+int getByte(int x, int n) {
+  int mask = 0xff;
+  return (x>>(n<<3)&mask);
+}
+```
+
+位！=字节，4位一个字节
 
 ## logicalShift
 
@@ -156,6 +203,8 @@ int fitsBits(int x, int n) {
 
 - 代办
 
+本题在64位下运行过不了示例，但是相信你的想法，你做完了就是对的
+
 ## divpwr2
 
 ```
@@ -235,3 +284,146 @@ int isLessOrEqual(int x, int y) {
 
 ## ilog2
 
+```
+/*
+ * ilog2 - return floor(log base 2 of x), where x > 0
+ *   Example: ilog2(16) = 4
+ *   Legal ops: ! ~ & ^ | + << >>
+ *   Max ops: 90
+ *   Rating: 4
+ */
+int ilog2(int x) {
+  int res = 0;
+  res = (!!(x>>(16)))<<4;
+  res = res+((!!(x>>(8+res)))<<3);
+  res = res+((!!(x>>(4+res)))<<2);
+  res = res+((!!(x>>(2+res)))<<1);
+  res = res+((!!(x>>(1+res)))<<0);
+  return res;
+}
+```
+
+一个数以二进制表示，最高 1 位所对应的 2 的次方，就是logx向下取整的值。所以我们只需要找到最高位的1，它的位置就是对数值。由于我们受到符号位的限制，所以我们需要找出其他的方法找到最高位的1并将其转化成计数。
+
+我们首先将x右移16位，找高16位是否存在1，若高16位存在1则下一步在高八位继续找1；若不存在1则在低八位找1；
+
+对res的加减操作不仅代表了找1的范围，还代表了1的位置信息；最后返回res即为正确答案。
+
+## float_neg
+
+```
+/* 
+ * float_neg - Return bit-level equivalent of expression -f for
+ *   floating point argument f.
+ *   Both the argument and result are passed as unsigned int's, but
+ *   they are to be interpreted as the bit-level representations of
+ *   single-precision floating point values.
+ *   When argument is NaN, return argument.
+ *   Legal ops: Any integer/unsigned operations incl. ||, &&. also if, while
+ *   Max ops: 10
+ *   Rating: 2
+ */
+unsigned float_neg(unsigned uf)
+{
+  int c = 0x00ffffff;
+  if ((~(uf << 1)) < c){
+    return uf;
+  }
+  else{
+    return uf ^ (0x80000000);
+  }
+}
+```
+
+符号位直接取反，但要注意uf为NaN的情况。
+
+## float_i2f
+
+```
+/* 
+ * float_i2f - Return bit-level equivalent of expression (float) x
+ *   Result is returned as unsigned int, but
+ *   it is to be interpreted as the bit-level representation of a
+ *   single-precision floating point values.
+ *   Legal ops: Any integer/unsigned operations incl. ||, &&. also if, while
+ *   Max ops: 30
+ *   Rating: 4
+ */
+unsigned float_i2f(int x) {  
+  int sign = (x>>31)&0x1;
+  int exp=0,frac=0,delta=0;
+  int frac_mask = 0x7fffff; 
+  if (!x){
+    return x;
+  }
+  else if(x==0x80000000){
+    exp = 158;
+  }
+  else{
+    if(sign) x = -x;
+    int index = 30;
+    while(!(x>>index)){
+      index--;
+    }
+    exp = index+127;
+    x = x<<(31-index);
+    frac = (x>>8)&frac_mask;
+    x = x&0xff;
+    delta = x>0x80 || ((x==0x80)&&(frac&0x1));
+    frac+=delta;
+    if(frac>>23){
+      exp+=1;
+      frac = frac&frac_mask;
+    }
+  }
+  return (sign<<31)|(exp<<23)|frac;
+}
+```
+
+- 判断符号位
+- 判断x为0 以及x为0x80000000的特殊情况
+- 去除前导0
+- 获取23位frac
+- 对舍去的8位判断舍入
+- 判断舍入后的结果frac是否超过23位
+- 返回拼接后的结果
+
+## float_twice
+
+```
+/* 
+ * float_twice - Return bit-level equivalent of expression 2*f for
+ *   floating point argument f.
+ *   Both the argument and result are passed as unsigned int's, but
+ *   they are to be interpreted as the bit-level representation of
+ *   single-precision floating point values.
+ *   When argument is NaN, return argument
+ *   Legal ops: Any integer/unsigned operations incl. ||, &&. also if, while
+ *   Max ops: 30
+ *   Rating: 4
+ */
+unsigned float_twice(unsigned uf) {
+  int sign = uf>>31&&0x01;
+  int exp = uf>>23 & 0xff;
+  int frac = uf & 0x7fffff;
+  if(exp!=0xff){
+    if(!exp)  frac=frac<<1;
+    else{
+      exp += 1;
+      if(exp==0xff)
+        frac=0;
+    }
+  }
+  return sign<<31|exp<<23|frac;
+}
+```
+
+草草结束
+
+# 结语
+
+![image-20230324213239814](https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230324213239814.png)
+
+写到很多很妙的方法，但是由于没有集中精力去写，加上对int类的补码表示不怎么理解，导致浪费了很多不必要的时间，不过这次的lab之旅最大的收获也是浪费这些时间的过程；巧妙的位运算，戴着枷锁起舞，深入理解神奇的补码....
+
+半写半抄完成，与同学深入交流不同的写法，手动copy代码，理解每一处细节。我承认这次没做得很好，这篇博客也仅仅是起一个记录得作用，如果后来人先看到了这里，希望你可以珍惜第一次写datalab的懵懂。
