@@ -87,3 +87,151 @@ int logicalShift(int x, int n) {
 
 此外若改变一下思路，我们使用10与左移的操作，可以直接不考虑符号位的问题。
 
+## bang
+
+```
+/* 
+ * bang - Compute !x without using !
+ *   Examples: bang(3) = 0, bang(0) = 1
+ *   Legal ops: ~ & ^ | + << >>
+ *   Max ops: 12
+ *   Rating: 4 
+ */
+int bang(int x) {
+  x=(x>>16)|x;
+  x=(x>>8)|x;
+  x=(x>>4)|x;
+  x=(x>>2)|x;
+  x=(x>>1)|x;
+  return ~x&0x1;
+}
+```
+
+取非操作，若该数不为0，则该数至少有一位为1；我们用压缩的思想，将每一位的信息依次压缩，直到到最低有效位，再与0x1相与得到最终的返回值。
+
+## tmin
+
+```
+/* 
+ * tmin - return minimum two's complement integer 
+ *   Legal ops: ! ~ & ^ | + << >>
+ *   Max ops: 4
+ *   Rating: 1
+ */
+int tmin(void) {
+  return 0x1<<31;
+}
+```
+
+获取最小的二进制补码，直接左移31位。
+
+## fitsBits
+
+```
+/* 
+ * fitsBits - return 1 if x can be represented as an 
+ *  n-bit, two's complement integer.
+ *   1 <= n <= 32
+ *   Examples: fitsBits(5,3) = 0, fitsBits(-4,3) = 1
+ *   Legal ops: ! ~ & ^ | + << >>
+ *   Max ops: 15
+ *   Rating: 2
+ */
+int fitsBits(int x, int n) {
+    int tmp = x>>(~(~n));
+    tmp = (tmp+1)>>1;
+    return !(tmp);
+}
+```
+
+因为n位二进制的最高位为符号位，一个数能否被n位二进制表示与符号位并无关系，我们只需要关注n-1位的内容是否与x的数据位匹配；其实从某种意义上来说，n-1位的内容也是无关紧要的，我们更需要关注的是n-1位以后的位是否有我们无法表示的信息；
+
+当x为正数时，我们假设x能被n位二进制数表示，那么n-1位后将不包含任何信息，也就是全为0；
+
+当x为负数时同理，只不过n-1位后全为1；
+
+我们现在要寻找一种能将这一特性转化成为逻辑值的过程函数；首先我们将无关紧要的低n-1位右移出我们的工作区，注意~n(~n)可以表示n-1；随后我们将右移过后的数加上1，这是为了将负数与正数的判断条件达成统一，若负数满足表示的条件那么加一的操作会产生连锁反应将高位全置为0；至此第n位的part到此结束，我们将其右移，判断剩下的式子是非为全0就可完成判断。
+
+在本题中我们知道了对于负数来说高位的1就相当于正数高位的0，对于另一种方法而言：
+
+- 代办
+
+## divpwr2
+
+```
+/* 
+ * divpwr2 - Compute x/(2^n), for 0 <= n <= 30
+ *  Round toward zero
+ *   Examples: divpwr2(15,1) = 7, divpwr2(-33,4) = -2
+ *   Legal ops: ! ~ & ^ | + << >>
+ *   Max ops: 15
+ *   Rating: 2
+ */
+int divpwr2(int x, int n) {
+  int bias=(x>>31)&((0x1<<n)+~0);
+  return (x+bias)>>n;
+}
+```
+
+这题计算 x/(2^n) ，注意不能直接右移，直接右移是向下舍入的，题目要求是向零舍入，也就是正数向下舍入，负数向上舍入，这里参照 CS:APP 书上的做法，给负数加上一个偏正的因子 `(0x1<<n)+~0)` ，判断负数直接看符号位。
+
+## negate
+
+```
+/* 
+ * negate - return -x 
+ *   Example: negate(1) = -1.
+ *   Legal ops: ! ~ & ^ | + << >>
+ *   Max ops: 5
+ *   Rating: 2
+ */
+int negate(int x) {
+  return ~x+1;
+}
+```
+
+这题求 -x ，直接利用补码的性质 `-x=~x+1` 就可以了。
+
+## isPositive
+
+```
+/* 
+ * isPositive - return 1 if x > 0, return 0 otherwise 
+ *   Example: isPositive(-1) = 0.
+ *   Legal ops: ! ~ & ^ | + << >>
+ *   Max ops: 8
+ *   Rating: 3
+ */
+int isPositive(int x) {
+    return !(!x)&!((x>>31)&0x1);
+}
+```
+
+直接判断符号位，注意排除0的情况。
+
+## isLessOrEqual
+
+```
+/* 
+ * isLessOrEqual - if x <= y  then return 1, else return 0 
+ *   Example: isLessOrEqual(4,5) = 1.
+ *   Legal ops: ! ~ & ^ | + << >>
+ *   Max ops: 24
+ *   Rating: 3
+ */
+int isLessOrEqual(int x, int y) {
+  int val=!!((x+~y)>>31);
+  x=x>>31;
+  y=y>>31;
+  return (!!x|!y)&((!!x&!y)|(val));
+}
+```
+
+当y大于等于x时候返回1，由于不能使用减号，我们直接使用~x，y+(~x)相当于y+1-x，故直接判断符号位就可以实现判断。
+
+我们需要额外考虑的就是减法溢出的情况，正数一定大于负数，但是正数减负数会出现溢出的情况；所以对于一些显而易见的操作我们直接返回判断的值；对于正数减正数再用相减的值进行判断。
+
+`(!!x|!y)&((!!x&!y)|(val))`  有空再分析
+
+## ilog2
+
