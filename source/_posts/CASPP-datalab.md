@@ -30,6 +30,8 @@ git clone https://github.com/WuJean/HNU-CSAPP.git
 
 如遇到编译错误可能是缺少在64位下运行32位的相关包，apt获取后再次make即可
 
+具体表现为头找不到头文件的错误
+
 做完每题后用 ./dlc 查看使用符号是否符合规范，再次make后执行 ./btest查看分数
 
 ## bitAnd
@@ -185,7 +187,7 @@ int tmin(void) {
  *   Rating: 2
  */
 int fitsBits(int x, int n) {
-    int tmp = x>>(~(~n));
+    int tmp = x>>(~(~n+1));
     tmp = (tmp+1)>>1;
     return !(tmp);
 }
@@ -203,7 +205,25 @@ int fitsBits(int x, int n) {
 
 - 代办
 
-本题在64位下运行过不了示例，但是相信你的想法，你做完了就是对的
+本题在64位下运行过不了示例，但是相信你的想法，你做完了就是对的（其实是测试用例错了）
+
+我们查看错误时可以看到当n为32时理论上对于任何的x都应该返回1，但是测试用例返回了0；我们可以在工作区文件夹中找到tests.c文件，查看其中生成fitbits测试结果的函数：
+
+```
+int test_fitsBits(int x, int n)
+{
+  if(n==32) return 1;
+  int TMin_n = -(1 << (n-1));
+  int TMax_n = (1 << (n-1)) - 1;
+  return x >= TMin_n && x <= TMax_n;
+}
+```
+
+乍一看是没错的，但是由于编译优化，这段代码中的某些指令被简化了导致结果出错，具体的错误过程理解一下就好，我们只需要在函数的开头加上:
+
+```
+if(n==32) return 1;
+```
 
 ## divpwr2
 
