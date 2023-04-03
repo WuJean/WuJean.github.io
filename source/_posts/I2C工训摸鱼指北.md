@@ -489,83 +489,100 @@ wire d5ms_over; //等待
 - R_DACK状态：等待读操作的确认信号DACK，表示读操作已完成。
 
 ```
+//下一状态判断
 always@(*)
 case (i2c)
-IDLE: begin next_i = IDLE;if(wr_op|rd_op) next_i = WAIT_WTICK0;end //有读写操作跳出空闲状态
-//wait tick
-WAIT_WTICK0:begin next_i = WAIT_WTICK0;if(scl_tick) next_i=WAIT_WTICK1;end
-WAIT_WTICK1:begin next_i = WAIT_WTICK1;if(scl_tick) next_i = W_START;end
-//START:SCL=1,SDA=1->0(scl_lc)
-W_START:begin next_i=W_START;if(scl_tick) next_i=W_DEVICE7;end
-//DEVICE ADDRESS（1010_000_0(WRITE)）
-W_DEVICE7:begin next_i = W_DEVICE7;if(scl_tick) next_i=W_DEVICE6;end
-W_DEVICE6:begin next_i = W_DEVICE6;if(scl_tick) next_i=W_DEVICE5;end
-W_DEVICE5:begin next_i = W_DEVICE5;if(scl_tick) next_i=W_DEVICE4;end
-W_DEVICE4:begin next_i = W_DEVICE4;if(scl_tick) next_i=W_DEVICE3;end
-W_DEVICE3:begin next_i = W_DEVICE3;if(scl_tick) next_i=W_DEVICE2;end
-W_DEVICE2:begin next_i = W_DEVICE2;if(scl_tick) next_i=W_DEVICE1;end
-W_DEVICE1:begin next_i = W_DEVICE1;if(scl_tick) next_i=W_DEVICE0;end
-W_DEVICE0:begin next_i = W_DEVICE0;if(scl_tick) next_i=W_DEVACK;end
-//ACK
-W_DEVACK:begin next_i=W_DEVACK;if(scl_tick) next_i=W_ADDRES7;end
-//WORD ADDRESS
-W_ADDRES7 :begin next_i = W_ADDRES7;if(scl_tick) next_i=W_ADDRES6;end
-W_ADDRES6 :begin next_i = W_ADDRES6;if(scl_tick) next_i=W_ADDRES5;end
-W_ADDRES5 :begin next_i = W_ADDRES5;if(scl_tick) next_i=W_ADDRES4;end
-W_ADDRES4 :begin next_i = W_ADDRES4;if(scl_tick) next_i=W_ADDRES3;end
-W_ADDRES3 :begin next_i = W_ADDRES3;if(scl_tick) next_i=W_ADDRES2;end
-W_ADDRES2 :begin next_i = W_ADDRES2;if(scl_tick) next_i=W_ADDRES1;end
-W_ADDRES1 :begin next_i = W_ADDRES1;if(scl_tick) next_i=W_ADDRES0;end
-W_ADDRES0 :begin next_i = W_ADDRES0;if(scl_tick) next_i=W_AACK;end
-//ACK
-W_AACK:begin next_i = W_AACK;
-if(scl_tick&wr_op) next_i=W_DATA7; //wr_op即写命令，开始写数据
-else if(scl_tick&rd_op) next_i=WAIT_WTICK3; //rd_op读命令,则下一状态为WAIT_WTICK3
-end
-//WRITE DATA[7:0]
-W_DATA7:begin next_i=W_DATA7;if(scl_tick)next_i=W_DATA6;end
-W_DATA6:begin next_i=W_DATA6;if(scl_tick)next_i=W_DATA5;end
-W_DATA5:begin next_i=W_DATA5;if(scl_tick)next_i=W_DATA4;end
-W_DATA4:begin next_i=W_DATA4;if(scl_tick)next_i=W_DATA3;end
-W_DATA3:begin next_i=W_DATA3;if(scl_tick)next_i=W_DATA2;end
-W_DATA2:begin next_i=W_DATA2;if(scl_tick)next_i=W_DATA1;end
-W_DATA1:begin next_i=W_DATA1;if(scl_tick)next_i=W_DATA0;end
-W_DATA0:begin next_i=W_DATA0;if(scl_tick)next_i=W_DACK;end
-//ACK
-W_DACK:begin next_i=W_DACK; if(scl_tick) next_i=S_STOP;end
-//Current Address Read
-//START: SCL=1,SDA=1->0(scl_lc)
-WAIT_WTICK3:begin next_i=WAIT_WTICK3; if(scl_tick) next_i=R_START;end
-R_START:begin next_i=R_START; if(scl_tick)next_i=R_DEVICE7;end
-//DEVICE ADDRESS(1010_000_1(READ))
-R_DEVICE7:begin next_i=R_DEVICE7; if(scl_tick) next_i=R_DEVICE6;end
-R_DEVICE6:begin next_i=R_DEVICE6; if(scl_tick) next_i=R_DEVICE5;end
-R_DEVICE5:begin next_i=R_DEVICE5; if(scl_tick) next_i=R_DEVICE4;end
-R_DEVICE4:begin next_i=R_DEVICE4; if(scl_tick) next_i=R_DEVICE3;end
-R_DEVICE3:begin next_i=R_DEVICE3; if(scl_tick) next_i=R_DEVICE2;end
-R_DEVICE2:begin next_i=R_DEVICE2; if(scl_tick) next_i=R_DEVICE1;end
-R_DEVICE1:begin next_i=R_DEVICE1; if(scl_tick) next_i=R_DEVICE0;end
-R_DEVICE0:begin next_i=R_DEVICE0; if(scl_tick) next_i=R_DACK;end
-//ACK
-R_DACK:begin next_i=R_DACK;if(scl_tick) next_i=R_DATA7;end
-//READ DATA[7:0], SDA:input
-R_DATA7:begin next_i=R_DATA7;if(scl_tick) next_i=R_DATA6;end
-R_DATA6:begin next_i=R_DATA6;if(scl_tick) next_i=R_DATA5;end
-R_DATA5:begin next_i=R_DATA5;if(scl_tick) next_i=R_DATA4;end
-R_DATA4:begin next_i=R_DATA4;if(scl_tick) next_i=R_DATA3;end
-R_DATA3:begin next_i=R_DATA3;if(scl_tick) next_i=R_DATA2;end
-R_DATA2:begin next_i=R_DATA2;if(scl_tick) next_i=R_DATA1;end
-R_DATA1:begin next_i=R_DATA1;if(scl_tick) next_i=R_DATA0;end
-R_DATA0:begin next_i=R_DATA0;if(scl_tick) next_i=R_NOACK;end
-//NO ACK
-R_NOACK:begin next_i=R_NOACK;if(scl_tick) next_i=S_STOP;end
-//STOP
-S_STOP:begin next_i=S_STOP;if(scl_tick) next_i=S_STOP0;end
-S_STOP0:begin next_i=S_STOP0;if(scl_tick) next_i=S_STOP1;end
-S_STOP1:begin next_i=S_STOP1;if(scl_tick) next_i=W_OPOVER;end
-//WAIT write_op=0,read_op=0;
-W_OPOVER:begin next_i = W_OPOVER;if(d5ms_over)next_i=IDLE;end //操作结束回到空闲状态
-default:begin next_i= IDLE;end
+	IDLE: begin next_i = IDLE;if(wr_op|rd_op) next_i = WAIT_WTICK0;end		//有读写操作跳出空闲状态
+
+	//wait tick
+	WAIT_WTICK0:begin next_i = WAIT_WTICK0;if(scl_tick) next_i=WAIT_WTICK1;end	
+	WAIT_WTICK1:begin next_i = WAIT_WTICK1;if(scl_tick) next_i = W_START;end
+	
+	//START:SCL=1,SDA=1->0(scl_lc)
+	W_START:begin next_i=W_START;if(scl_tick) next_i=W_DEVICE7;end
+	
+	//DEVICE ADDRESS（1010_000_0(WRITE)）
+	W_DEVICE7:begin next_i = W_DEVICE7;if(scl_tick) next_i=W_DEVICE6;end
+	W_DEVICE6:begin next_i = W_DEVICE6;if(scl_tick) next_i=W_DEVICE5;end
+	W_DEVICE5:begin next_i = W_DEVICE5;if(scl_tick) next_i=W_DEVICE4;end
+	W_DEVICE4:begin next_i = W_DEVICE4;if(scl_tick) next_i=W_DEVICE3;end
+	W_DEVICE3:begin next_i = W_DEVICE3;if(scl_tick) next_i=W_DEVICE2;end
+	W_DEVICE2:begin next_i = W_DEVICE2;if(scl_tick) next_i=W_DEVICE1;end
+	W_DEVICE1:begin next_i = W_DEVICE1;if(scl_tick) next_i=W_DEVICE0;end
+	W_DEVICE0:begin next_i = W_DEVICE0;if(scl_tick) next_i=W_DEVACK;end
+	
+	//ACK
+	W_DEVACK:begin next_i=W_DEVACK;if(scl_tick) next_i=W_ADDRES7;end
+	
+	//WORD ADDRESS
+	W_ADDRES7 :begin next_i = W_ADDRES7;if(scl_tick) next_i=W_ADDRES6;end
+	W_ADDRES6 :begin next_i = W_ADDRES6;if(scl_tick) next_i=W_ADDRES5;end
+	W_ADDRES5 :begin next_i = W_ADDRES5;if(scl_tick) next_i=W_ADDRES4;end
+	W_ADDRES4 :begin next_i = W_ADDRES4;if(scl_tick) next_i=W_ADDRES3;end
+	W_ADDRES3 :begin next_i = W_ADDRES3;if(scl_tick) next_i=W_ADDRES2;end
+	W_ADDRES2 :begin next_i = W_ADDRES2;if(scl_tick) next_i=W_ADDRES1;end
+	W_ADDRES1 :begin next_i = W_ADDRES1;if(scl_tick) next_i=W_ADDRES0;end
+	W_ADDRES0 :begin next_i = W_ADDRES0;if(scl_tick) next_i=W_AACK;end
+	
+	//ACK
+	W_AACK:begin next_i = W_AACK;
+				 if(scl_tick&wr_op) next_i=W_DATA7;			//wr_op即写命令，开始写数据
+				 else if(scl_tick&rd_op) next_i=WAIT_WTICK3;		//rd_op读命令,则下一状态为WAIT_WTICK3
+		   end
+	
+	//WRITE DATA[7:0]
+	W_DATA7:begin next_i=W_DATA7;if(scl_tick)next_i=W_DATA6;end
+	W_DATA6:begin next_i=W_DATA6;if(scl_tick)next_i=W_DATA5;end
+	W_DATA5:begin next_i=W_DATA5;if(scl_tick)next_i=W_DATA4;end
+	W_DATA4:begin next_i=W_DATA4;if(scl_tick)next_i=W_DATA3;end
+	W_DATA3:begin next_i=W_DATA3;if(scl_tick)next_i=W_DATA2;end
+	W_DATA2:begin next_i=W_DATA2;if(scl_tick)next_i=W_DATA1;end
+	W_DATA1:begin next_i=W_DATA1;if(scl_tick)next_i=W_DATA0;end
+	W_DATA0:begin next_i=W_DATA0;if(scl_tick)next_i=W_DACK;end
+	
+	//ACK
+	W_DACK:begin next_i=W_DACK; if(scl_tick) next_i=S_STOP;end
+	
+	//Current Address Read
+	//START: SCL=1,SDA=1->0(scl_lc)
+	
+	WAIT_WTICK3:begin next_i=WAIT_WTICK3; if(scl_tick) next_i=R_START;end
+	R_START:begin next_i=R_START; if(scl_tick)next_i=R_DEVICE7;end
+	
+	//DEVICE ADDRESS(1010_000_1(READ)) 
+	R_DEVICE7:begin next_i=R_DEVICE7; if(scl_tick) next_i=R_DEVICE6;end
+	R_DEVICE6:begin next_i=R_DEVICE6; if(scl_tick) next_i=R_DEVICE5;end
+	R_DEVICE5:begin next_i=R_DEVICE5; if(scl_tick) next_i=R_DEVICE4;end
+	R_DEVICE4:begin next_i=R_DEVICE4; if(scl_tick) next_i=R_DEVICE3;end
+	R_DEVICE3:begin next_i=R_DEVICE3; if(scl_tick) next_i=R_DEVICE2;end
+	R_DEVICE2:begin next_i=R_DEVICE2; if(scl_tick) next_i=R_DEVICE1;end
+	R_DEVICE1:begin next_i=R_DEVICE1; if(scl_tick) next_i=R_DEVICE0;end
+	R_DEVICE0:begin next_i=R_DEVICE0; if(scl_tick) next_i=R_DACK;end
+	
+	//ACK
+	R_DACK:begin next_i=R_DACK;if(scl_tick) next_i=R_DATA7;end
+	
+	//READ DATA[7:0], SDA:input
+	R_DATA7:begin next_i=R_DATA7;if(scl_tick) next_i=R_DATA6;end
+	R_DATA6:begin next_i=R_DATA6;if(scl_tick) next_i=R_DATA5;end
+	R_DATA5:begin next_i=R_DATA5;if(scl_tick) next_i=R_DATA4;end
+	R_DATA4:begin next_i=R_DATA4;if(scl_tick) next_i=R_DATA3;end
+	R_DATA3:begin next_i=R_DATA3;if(scl_tick) next_i=R_DATA2;end
+	R_DATA2:begin next_i=R_DATA2;if(scl_tick) next_i=R_DATA1;end
+	R_DATA1:begin next_i=R_DATA1;if(scl_tick) next_i=R_DATA0;end
+	R_DATA0:begin next_i=R_DATA0;if(scl_tick) next_i=R_NOACK;end
+	
+	//NO ACK
+	R_NOACK:begin next_i=R_NOACK;if(scl_tick) next_i=S_STOP;end
+	
+	//STOP
+	S_STOP:begin next_i=S_STOP;if(scl_tick) next_i=S_STOP0;end
+	S_STOP0:begin next_i=S_STOP0;if(scl_tick) next_i=S_STOP1;end
+	S_STOP1:begin next_i=S_STOP1;if(scl_tick) next_i=W_OPOVER;end			
+	
+	//WAIT write_op=0,read_op=0;
+	W_OPOVER:begin next_i = W_OPOVER;if(d5ms_over)next_i=IDLE;end		//操作结束回到空闲状态
+	default:begin next_i= IDLE;end
 endcase
 ```
 
@@ -573,13 +590,15 @@ endcase
 
 ```
 //SCL
-assign clr_scl=scl_ls&(i2c!=IDLE)&(i2c!=WAIT_WTICK0)& //clr_scl，scl置0信号
-(i2c != WAIT_WTICK1)&(i2c!=W_START)&(i2c!=R_START)
-&(i2c!=S_STOP0)&(i2c!=S_STOP1)&(i2c!=W_OPOVER);
+assign clr_scl=scl_ls&(i2c!=IDLE)&(i2c!=WAIT_WTICK0)&					//clr_scl，scl置0信号
+			   (i2c != WAIT_WTICK1)&(i2c!=W_START)&(i2c!=R_START)
+			   &(i2c!=S_STOP0)&(i2c!=S_STOP1)&(i2c!=W_OPOVER);
+
 always @(posedge clk or negedge rstn)
-if(!rstn) scl <= 1'b1; //复位，scl为高电平
-else if(clr_scl) scl <= 1'b0; //scl 1->0
-else if(scl_hs) scl <=1'b1; //scl 0->1，high start，clk15
+if(!rstn) scl <= 1'b1;									//复位，scl为高电平
+else if(clr_scl) scl <= 1'b0;								//scl 1->0
+else if(scl_hs) scl <=1'b1;								//scl 0->1
+
 ```
 
 ### SDA实现
@@ -588,3 +607,150 @@ SDA线是I2C总线上的双向数据线，用于在主设备和从设备之间�
 
 ![image-20230402172437019](https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230402172437019.png)
 
+对于i2c_rlf，它是通过对i2c信号的不同取值进行逻辑判断得出的，如果i2c信号满足读写条件，则i2c_rlf信号被置为1，否则被置为0。其中i2c的取值包括写器件地址、写数据地址、写数据、读器件地址、读数据时钟等操作。
+
+```
+//SDA
+reg [7:0]i2c_reg;
+assign start_clr = scl_lc &((i2c==W_START)|(i2c==R_START));				//在scl low center开始读写操作
+assign ld_wdevice = scl_lc&(i2c==W_DEVICE7);						//加载器件地址
+assign ld_waddres = scl_lc&(i2c==W_ADDRES7);						//加载数据地址
+assign ld_wdata= scl_lc&(i2c==W_DATA7);						//加载数据
+assign ld_rdevice = scl_lc&(i2c==R_DEVICE7);						//读操作的器件地址
+assign noack_set = scl_lc&(i2c==R_NOACK);						//读操作完毕
+assign stop_clr = scl_lc&(i2c==S_STOP);						
+assign stop_set = scl_lc&((i2c==S_STOP0)|(i2c==WAIT_WTICK3));
+
+assign i2c_rlf =scl_lc&(								//有读写则i2c_rlf
+				(i2c == W_DEVICE6)|
+				(i2c == W_DEVICE5)|
+				(i2c == W_DEVICE4)|
+				(i2c == W_DEVICE3)|
+				(i2c == W_DEVICE2)|
+				(i2c == W_DEVICE1)|
+				(i2c == W_DEVICE0)|
+				(i2c == W_ADDRES6)|
+				(i2c == W_ADDRES5)|
+				(i2c == W_ADDRES4)|
+				(i2c == W_ADDRES3)|
+				(i2c == W_ADDRES2)|
+				(i2c == W_ADDRES1)|
+				(i2c == W_ADDRES0)|
+				(i2c == W_DATA6)|
+				(i2c == W_DATA5)|
+				(i2c == W_DATA4)|
+				(i2c == W_DATA3)|
+				(i2c == W_DATA2)|
+				(i2c == W_DATA1)|
+				(i2c == W_DATA0)|
+				(i2c == R_DEVICE6)|
+				(i2c == R_DEVICE5)|
+				(i2c == R_DEVICE4)|
+				(i2c == R_DEVICE3)|
+				(i2c == R_DEVICE2)|
+				(i2c == R_DEVICE1)|
+				(i2c == R_DEVICE0));
+```
+
+我们结合这两段代码来看，可以很清楚看到我们通过状态判断得到当前状态的信息，生成状态判断码，在时钟上升沿的时候通过状态码执行读写的操作。i2c_rlf为1时i2creg会左移一位，因为sda 是单位宽的，每次把i2creg的最高位送到sda上，因此左移就是一位一位把数据送到sda上。
+
+```
+//SDA
+reg [7:0]i2c_reg;
+assign start_clr = scl_lc &((i2c==W_START)|(i2c==R_START));				//在scl low center开始读写操作
+assign ld_wdevice = scl_lc&(i2c==W_DEVICE7);						//加载器件地址
+assign ld_waddres = scl_lc&(i2c==W_ADDRES7);						//加载数据地址
+assign ld_wdata= scl_lc&(i2c==W_DATA7);						//加载数据
+assign ld_rdevice = scl_lc&(i2c==R_DEVICE7);						//读操作的器件地址
+assign noack_set = scl_lc&(i2c==R_NOACK);						//读操作完毕
+assign stop_clr = scl_lc&(i2c==S_STOP);						
+assign stop_set = scl_lc&((i2c==S_STOP0)|(i2c==WAIT_WTICK3));
+```
+
+```
+always@(posedge clk or negedge rstn)
+if(!rstn) i2c_reg <= 8'hff;								//复位，高电平
+else if(start_clr) i2c_reg <= 8'h00;							//开始读写，低电平
+else if(ld_wdevice) i2c_reg <= {4'b1010,3'b000,1'b0};					//10100000 写
+else if(ld_waddres) i2c_reg <= addr;							//加载数据地址
+else if(ld_wdata) i2c_reg <= write_data;							//加载写入的数据
+else if(ld_rdevice) i2c_reg <= {4'b1010,3'b000,1'b1};					//10100001 读
+else if(noack_set) i2c_reg <= 8'hff;							//NOACK
+else if(stop_clr) i2c_reg <= 8'h00;
+else if(stop_set) i2c_reg <= 8'hff;
+else if(i2c_rlf) i2c_reg <= {i2c_reg[6:0],1'b0};						//左移
+```
+
+ `assign sda= sda_en?sda_o: 1'bz;` 是将 SDA 使能为 1 时，SDA 的输出为 `sda_o`，否则为高阻态（`1'bz`）。`assign clr_sdaen` 和 `assign set_sdaen` 是用来控制 SDA 使能信号的，具体是根据 I2C 协议状态机的状态来确定。在 `always` 块中，如果 `sda_wr` 为 1，就将 SDA 的值左移一位，然后将当前的 SDA 线的值赋给最低位。
+
+```
+assign sda_o = i2c_reg[7];								//sda输出
+assign clr_sdaen = (i2c==IDLE)|							//sda使能置0信号
+				   (scl_lc&(
+				   (i2c==W_DEVACK)|
+				   (i2c==W_AACK)|
+				   (i2c==W_DACK)|
+				   (i2c==R_DACK)|
+				   (i2c==R_DATA7)));
+
+assign set_sdaen = scl_lc&(								//sda使能置1信号
+				   (i2c==WAIT_WTICK0)|
+				   (i2c==W_ADDRES7)|
+				   (i2c==W_DATA7)|
+				   (i2c==WAIT_WTICK3)|
+				   (i2c==S_STOP)|
+				   (i2c==R_NOACK));
+
+reg sda_en;
+always @(posedge clk or negedge rstn)
+if(!rstn) sda_en <= 0;								
+else if (clr_sdaen) sda_en <=0;
+else if(set_sdaen) sda_en <= 1'b1;
+
+assign sda= sda_en?sda_o: 1'bz;							//sda使能为1时sda可工作
+
+assign sda_wr = scl_hc &(								//读数据
+				(i2c==R_DATA7)|
+				(i2c==R_DATA6)|
+				(i2c==R_DATA5)|
+				(i2c==R_DATA4)|
+				(i2c==R_DATA3)|
+				(i2c==R_DATA2)|
+				(i2c==R_DATA1)|
+				(i2c==R_DATA0));
+
+always@(posedge clk or negedge rstn)
+if(!rstn) read_data <= 0;
+else if(sda_wr) read_data <= {read_data[6:0],sda};					//左移读入数据
+```
+
+其中i2c表示当前的写操作状态，op_done表示写操作是否完成，d5ms_cnt用于计数5毫秒的时间，d5ms_over表示5毫秒时间已经过去。
+
+在具体实现上，代码中使用了assign语句和always语句来实现状态变量的赋值和状态转移，使用了时序逻辑实现了计数器功能。在写操作完成后，d5ms_over会被设置为1，表示可以进行下一次写操作。
+
+```
+//op_done
+assign op_done = (i2c == W_OPOVER);						//操作结束
+
+//Write Cycle(5ms)
+//6MHZ = 166ns,5ms/166ns = 31
+reg [12:0] d5ms_cnt;
+always @(posedge clk or negedge rstn)
+if(!rstn)    d5ms_cnt <= 8'd0;
+else if(i2c==IDLE) d5ms_cnt <= 8'd0;
+else if(i2c==W_OPOVER) d5ms_cnt <= d5ms_cnt + 1'b1;
+
+assign d5ms_over = (d5ms_cnt==13'h1FFF);
+```
+
+# 实验总结
+
+在进行 I2C 协议 EEPROM 读写代码仿真实验中，我对 I2C 协议以及 Verilog HDL 的应用有了更深入的了解。
+
+首先，在进行实验前，我通过学习相关的 I2C 协议知识，了解了 I2C 协议的传输方式、信号时序以及协议的基本操作。这些知识对我在仿真实验中理解代码的意义以及分析仿真结果有很大的帮助。
+
+其次，在编写代码时，我需要按照 I2C 协议的时序要求，对代码进行时序分析，并根据时序分析结果编写 Verilog HDL 代码。在这个过程中，我深刻体会到了 Verilog HDL 的强大和灵活，可以实现非常复杂的功能。
+
+最后，在进行仿真实验时，我利用 Modelsim工具对代码进行仿真，观察仿真结果并进行分析。通过仿真实验，我不仅验证了代码的正确性，还能进一步优化代码的性能和实现效果，为后续的硬件实现提供了有价值的参考。
+
+总之，通过这次实验，我对 I2C 协议和 Verilog HDL 有了更深入的了解，也对数字电路设计和硬件实现有了更深刻的认识，相信这些知识对我的未来学习和研究会有很大的帮助。
