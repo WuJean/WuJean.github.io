@@ -8,7 +8,7 @@ keywords:
 description:
 top_img:
 comments:
-cover:
+cover: https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230407154110529.png
 ---
 
 本文记录了在nuc9上的esxi环境下安装ubuntu22.04虚拟机，并安装tesla p4驱动的过程。
