@@ -543,3 +543,213 @@ int main(){
 
 
 6. 编写一个程序，创建两个子进程，并使用 pipe()系统调用，将一个子进程的标准输出连接到另一个子进程的标准输入。
+
+# 第六章
+
+## 
+
+## 问题
+
+`gettimeofday()`​ 函数用于获取当前的时间和时区信息，其函数原型如下：
+
+```undefined
+#include <sys/time.h>
+
+int gettimeofday(struct timeval *tv, struct timezone *tz);
+```
+
+其中，`tv`​ 是指向 `timeval`​ 结构体的指针，用于返回当前时间，`tz`​ 是指向 `timezone`​ 结构体的指针，用于返回当前时区信息。如果不需要时区信息，可以将 `tz`​ 设为 `NULL`​。
+
+函数返回值为 0 表示成功，-1 表示失败并设置 `errno`​ 错误码。
+
+### 时钟的精确度
+
+```undefined
+#include<stdio.h>
+#include<sys/time.h>
+int main()
+{
+    struct timeval start,end;
+    for (int i = 0; i < 10; i++){
+        gettimeofday(&start,NULL);
+        gettimeofday(&end,NULL);
+        printf("Begin: %d us,Time used: %d us,End: %d us \n",start.tv_usec,end.tv_usec-start.tv_usec,end.tv_usec);
+    }
+    return 0;
+}
+```
+
+```undefined
+Begin: 785855 us,Time used: 1 us,End: 785856 us 
+Begin: 785945 us,Time used: 0 us,End: 785945 us 
+Begin: 785950 us,Time used: 0 us,End: 785950 us 
+Begin: 785954 us,Time used: 0 us,End: 785954 us 
+Begin: 785957 us,Time used: 0 us,End: 785957 us 
+Begin: 785960 us,Time used: 1 us,End: 785961 us 
+Begin: 785964 us,Time used: 0 us,End: 785964 us 
+Begin: 785968 us,Time used: 0 us,End: 785968 us 
+Begin: 785971 us,Time used: 0 us,End: 785971 us 
+Begin: 785974 us,Time used: 0 us,End: 785974 us
+```
+
+十次连续调用下函数耗时少，精度高，可以用来测量
+
+#### CPU亲和性
+
+在Linux系统中，可以使用sched_setaffinity()函数来设置线程的CPU亲和性，具体使用方法如下：
+
+```undefined
+#include <sched.h>
+
+int sched_setaffinity(pid_t pid, size_t cpusetsize, const cpu_set_t *mask);
+
+// 参数说明：
+// pid：要设置CPU亲和性的线程的ID，可以使用0表示当前线程
+// cpusetsize：mask参数的大小，一般使用sizeof(cpu_set_t)获取
+// mask：指向cpu_set_t类型的指针，表示要设置的CPU亲和性
+
+// 返回值：
+// 成功：0
+// 失败：-1，错误代码存储在errno中
+```
+
+其中，cpu_set_t类型是一个位掩码，每一位表示一个CPU核心，可以使用以下函数进行设置和清除：
+
+```undefined
+#include <sched.h>
+
+void CPU_ZERO(cpu_set_t *set);    // 清空所有CPU核心
+void CPU_SET(int cpu, cpu_set_t *set);    // 将指定CPU核心加入亲和性集合
+void CPU_CLR(int cpu, cpu_set_t *set);    // 将指定CPU核心从亲和性集合中删除
+int CPU_ISSET(int cpu, const cpu_set_t *set);    // 判断指定CPU核心是否在亲和性集合中
+```
+
+改进版本（单核心运行）
+
+```undefined
+#include<sched.h>
+//使该程序在单核CPU上运行
+void set_cpu(int cpu_number)
+{
+    cpu_set_t mask;
+    CPU_ZERO(&mask);
+    CPU_SET(cpu_number, &mask);
+    if (sched_setaffinity(0, sizeof(mask), &mask) == -1)
+    {
+        printf("warning: could not set CPU affinity, continuing...\n");
+    }
+}
+int main()
+{
+    set_cpu(0);
+    struct timeval start,end;
+    for (int i = 0; i < 10; i++){
+        gettimeofday(&start,NULL);
+        gettimeofday(&end,NULL);
+        printf("Begin: %ld us,Time used: %ld us,End: %ld us \n",start.tv_usec,end.tv_usec-start.tv_usec,end.tv_usec);
+    }
+    return 0;
+}
+"main.cpp" 27L, 682C
+```
+
+### 测量系统调用的上下文切换成本
+
+# 第七章 进程调度：介绍
+
+操作系统调度程序采用的上层策略
+
+* 工作负载假设
+
+  * 任务同时到达
+  * 只使用cpu
+  * 一旦开始保持运行到完成
+  * 任务运行相同时间
+  * 工作时间已知
+* 调度指标--周转时间
+
+  * 周转时间=完成时间-到达时间
+  * 先进先出（FIFO）
+
+    * 长任务在前 平均周转时间长
+  * 最短任务优先（SJF）
+
+    * SJF是非抢占式的调度策略
+    * 抢占式调度
+    * 当任务不同时到达时
+  * 最短完成时间优先（STCF）
+
+    * 向SJF添加抢占
+    * 是最优的
+* 调度指标--响应时间
+
+  * 响应时间=首次运行-到达时间
+  * 轮转（RR）
+
+    * 在一个时间片内运行一个工作然后切换到队列中的下一个任务
+    * 时间片长度要考虑上下文切换的成本（权衡长度摊销成本）
+  * 重叠可以提高利用率（第五章作业）
+* 结合I/O
+
+  * 保证交互运行
+  * 将子工作视为独立的工作
+* 当无法预测工作的长度该怎么办？
+
+  * 使用多级反馈队列
+
+## 问题
+
+```undefined
+./scheduler -h
+
+Usage: scheduler.py [options]
+
+Options:
+  -h, --help            show this help message and exit
+  -s SEED, --seed=SEED  the random seed
+  -j JOBS, --jobs=JOBS  number of jobs in the system
+  -l JLIST, --jlist=JLIST
+                        instead of random jobs, provide a comma-separated list
+                        of run times
+  -m MAXLEN, --maxlen=MAXLEN
+                        max length of job
+  -p POLICY, --policy=POLICY
+                        sched policy to use: SJF, FIFO, RR
+  -q QUANTUM, --quantum=QUANTUM
+                        length of time slice for RR policy
+  -c                    compute answers for me
+```
+
+1. ```undefined
+   ./scheduler.py -p FIFO -j 3 -l 200,200,200 -c
+   Average -- Response: 200.00  Turnaround 400.00  Wait 200.00
+   ./scheduler.py -p SJF -j 3 -l 200,200,200 -c
+   Average -- Response: 200.00  Turnaround 400.00  Wait 200.00
+   ```
+
+2. ```undefined
+   ./scheduler.py -p FIFO -j 3 -l 100,200,300 -c
+    Average -- Response: 133.33  Turnaround 333.33  Wait 133.33
+   ./scheduler.py -p SJF -j 3 -l 100,200,300 -c
+    Average -- Response: 133.33  Turnaround 333.33  Wait 133.33
+   ```
+
+3. ```undefined
+   ./scheduler.py -p RR -j 3 -l 200,200,200 -q 1 -c
+   Average -- Response: 1.00  Turnaround 599.00  Wait 399.00
+   ```
+
+添加 -q 1 选项，设置时间片为1，但是这个响应时间怪怪的
+
+好吧我懂了 响应时间指的是cpu第一次开始处理某个任务的时间
+
+4. 1. 当作业长度相同时，SJF调度算法的顺序与FIFO调度算法的顺序相同。因此，当所有作业的长度相同时，SJF调度算法将提供与FIFO调度算法相同的周转时间。
+    2. 当所有作业的到达时间相同时，SJF调度算法将执行与FIFO调度算法相同的调度顺序。在这种情况下，SJF调度算法将提供与FIFO调度算法相同的周转时间。
+
+5. 1. 当所有作业的长度相同时，SJF调度算法的顺序与RR调度算法的顺序相同。因此，在这种情况下，它们提供相同的响应时间。
+    2. 当所有进程的可用时间都相同时，并且RR算法的量子长度等于或大于所有进程的执行时间时，SJF算法和RR算法提供相同的响应时间。在这种情况下，SJF算法会立即选择可用时间最短的进程，并将其执行完毕。RR算法则会在相同的时间段内运行所有进程一次，因此如果所有进程的执行时间都不超过量子长度，则它们的响应时间将相同。
+
+6. 可能会增加，SJF算法可能不适合在具有变化的作业长度的系统中使用，因为它无法保证所有作业的响应时间都很短。
+7. 可能会增加或保持不变
+
+# 第八章 调度：多级反馈队列（MLFQ）
