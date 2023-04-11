@@ -2,7 +2,7 @@
 title: Esxi下配置ubuntu环境及tesla p4驱动安装
 date: 2023-04-04 17:15:35
 updated:
-tags:
+tags: Homelab
 categories:
 keywords:
 description:
