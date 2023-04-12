@@ -30,6 +30,8 @@ git clone https://github.com/chyyuu/ucore_lab.git
 
 ```
 sudo apt-get install qemu-system
+将qemu动态链接上
+sudo ln -s /usr/bin/qemu-system-i386 /usr/bin/qemu
 ```
 
 # 编程方法和通用数据结构
@@ -346,7 +348,7 @@ $(call create_target,bootblock)
 3. 从0x7c00开始跟踪代码运行,将单步跟踪反汇编得到的代码与bootasm.S和 bootblock.asm进行比较。
 4. 自己找一个bootloader或内核中的代码位置，设置断点并进行测试。
 
-#### 解答
+#### 解答1
 
 按照提示使用单步跟踪：
 
@@ -354,7 +356,7 @@ $(call create_target,bootblock)
 
 ```
 set architecture i8086
-target remote :1234
+target remote :1234	
 ```
 
 2. 在 lab1目录下，执行
@@ -411,5 +413,60 @@ debug-nox: $(UCOREIMG)
         $(V)$(TERMINAL) -e "gdb -q -x tools/gdbinit"
 ```
 
-我们在执行`make qemu`和`make debug`时候如果不想使用图形化，只需要在后面加上`-nox`参数：
+我们在执行`make qemu`和`make debug`时候如果不想使用图形化，只需要在后面加上`-nox`参数。
 
+#### 实在不想折腾了 换个desktop保平安
+
+因为你ssh连接的终端会被qemu的进程强制一直刷新占用，其实用gdb远程调试也是可以解决的，难度会相对比较大，这边还是建议新手用图形化界面降低难度。
+
+
+
+修改`tools/gdbinit`的内容：
+
+```
+file bin/kernel
+target remote :1234
+set architecture i8086
+break kern_init
+x /2i $pc
+define hook-stop
+x/2i $pc
+end
+```
+
+首先执行`continue`开始调试，之后使用`next`和`si`语句进行单步调试，最后使用`x /2i $pc`指令查看当前位置附近的两条汇编代码。
+
+#### 解答2
+
+现在我们要尝试使用一下启动内核并远程调试：
+
+此时在lab1目录下：
+
+```
+qemu -S -s -hda ./bin/ucore.img -monitor stdio     // 启动qemu运行ucore并开启远程调试服务
+```
+
+再在lab1目录下执行gdb：
+
+![image-20230412153106199](https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230412153106199.png)
+
+首先使用`b *0x7c00`指令在该地址处设下断点，然后使用`c`指令让程序执行至断点位置，最后使用`x /5i $pc`指令查看当前地址附近的 5 条汇编代码。如下图所示测试断点正常。
+
+#### 解答3
+
+修改lab1下的Makefile如下：
+
+![image-20230412153921031](https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230412153921031.png)
+
+-d和-D是gcc编译器的选项。
+
+- -d选项用于在编译时生成调试信息。这些调试信息包括汇编代码，源代码和符号表等信息，用于在调试代码时使用。
+- -D选项用于定义一个宏。该选项后面必须跟一个宏的名称，该名称将被定义为1。在代码中可以使用该宏名称进行条件编译，例如，如果定义了宏，则可以在代码中包含一些特定的功能，否则不包含。
+
+lab1_asm.log是生成的日志文件名称，其中记录了使用-d选项生成的汇编代码信息。
+
+因此，该命令行参数的含义是：使用gcc编译器生成汇编代码并记录到lab1_asm.log文件中。
+
+我们在Makefile的编译内核选项中加入这个参数，将调试得到的汇编代码放入日记文件中便于查看对比。
+
+执行`make debug`后发现lab1目录下多出了lab1_asm.log文件，将其与bootasm.S和bootblock.asm进行比较后发现长得很像。
