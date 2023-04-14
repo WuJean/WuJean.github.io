@@ -473,6 +473,8 @@ lab1_asm.log是生成的日志文件名称，其中记录了使用-d选项生成
 
 #### 解答4
 
+
+
 ### 练习3 分析bootloader进入保护模式的过程
 
 阅读**小节“保护模式和分段机制”**和lab1/boot/bootasm.S源码
@@ -514,7 +516,7 @@ Intel 80386只有在进入保护模式后，才能充分发挥其强大的功能
 
 ##### 段描述符
 
-每个段由如下三个参数进行定义：q
+每个段由如下三个参数进行定义：
 
 - 段基地址(Base Address)
 - 段界限(Limit)
@@ -522,5 +524,150 @@ Intel 80386只有在进入保护模式后，才能充分发挥其强大的功能
 
 #### 解答1
 
+A20线是一根用于控制地址总线的信号线，在早期的x86架构中，由于历史原因和硬件限制，A20线的状态是不稳定的，这会导致地址总线上的某些位不能被正确地设置或读取，从而影响系统的稳定性和可靠性。因此，为了解决这个问题，操作系统需要开启A20线，以确保地址总线的正确性和稳定性。
 
+具体来说，开启A20线可以使得CPU在保护模式下访问超过1MB的内存地址空间，这是因为在实模式下，CPU只能访问1MB以下的内存，而在保护模式下，CPU可以访问超过1MB的内存地址空间，这需要地址总线上的A20线处于稳定状态。
 
+利用键盘控制器（8042芯片）：在早期的PC机中，键盘控制器也被用作A20信号线的控制器。通过向键盘控制器发送特定的指令，可以开启或关闭A20线。具体实现方法可以参考Intel手册或者各种开源操作系统的实现代码。
+
+##### 具体操作
+
+分析`boot/bootasm.S`中开启A20总线的相关代码：
+
+```
+ # Enable A20:
+    #  For backwards compatibility with the earliest PCs, physical
+    #  address line 20 is tied low, so that addresses higher than
+    #  1MB wrap around to zero by default. This code undoes this.
+seta20.1:
+    inb $0x64, %al                                  # Wait for not busy(8042 input buffer empty).
+    testb $0x2, %al
+    jnz seta20.1
+
+    movb $0xd1, %al                                 # 0xd1 -> port 0x64
+    outb %al, $0x64                                 # 0xd1 means: write data to 8042's P2 port
+
+seta20.2:
+    inb $0x64, %al                                  # Wait for not busy(8042 input buffer empty).
+    testb $0x2, %al
+    jnz seta20.2
+
+    movb $0xdf, %al                                 # 0xdf -> port 0x60
+    outb %al, $0x60                                 # 0xdf = 11011111, means set P2's A20 bit(the 1 bit) to 1
+```
+
+这段代码实现了开启A20地址线的过程，主要包括以下步骤：
+
+1. 等待8042芯片的输入缓冲区空闲，以便发送下一条指令。
+2. 向8042芯片发送0xd1指令，表示要对8042芯片的P2端口进行写操作。
+3. 再次等待8042芯片的输入缓冲区空闲。
+4. 向8042芯片的P2端口发送0xdf指令，表示要设置A20地址线的第21位。
+5. 完成A20地址线的开启。
+
+8042芯片的命令/状态端口是一个8位寄存器，地址为0x64，它包含了8042芯片的状态信息以及接收指令的功能。具体来说，它包含以下位：
+
+- Bit 0（Output Buffer Status，输出缓冲区状态）：当该位为0时，表示输出缓冲区中没有数据；当该位为1时，表示输出缓冲区中有数据。
+- Bit 1（Input Buffer Status，输入缓冲区状态）：当该位为0时，表示输入缓冲区空闲；当该位为1时，表示输入缓冲区正在被使用。
+- Bit 2（System Flag，系统标志）：该位用于控制系统级别，不在本次讨论范围内。
+- Bit 3（Command/Data，指令/数据）：当该位为0时，表示将发送的是命令；当该位为1时，表示将发送的是数据。
+- Bit 4（Keyboard Locked，键盘锁定）：该位用于表示键盘是否被锁定，不在本次讨论范围内。
+- Bit 5（Auxiliary Output Buffer Status，辅助输出缓冲区状态）：该位用于表示辅助输出缓冲区中是否有数据，不在本次讨论范围内。
+- Bit 6（Timeout，超时）：当该位为1时，表示接收到的数据已超时。
+- Bit 7（Parity Error，奇偶校验错误）：当该位为1时，表示接收到的数据存在奇偶校验错误。
+
+在这段代码中，使用了0x64端口的第0位和第1位进行等待和状态检查。
+
+#### 解答2
+
+在x86架构的计算机系统中，GDT（全局描述符表）是一个系统级别的数据结构，用于存储操作系统和应用程序的内存分段信息。GDT表的初始化是操作系统引导过程中的一个重要步骤。
+
+以下是GDT表的初始化步骤：
+
+1. 定义一个包含GDT表项的结构体，每个表项描述了一个内存段的起始地址、大小、特权级等信息。
+2. 为结构体中每个表项设置对应的标识符（段选择符）。
+3. 将结构体的基地址和大小（表项数目）存储在GDTR（全局描述符表寄存器）中。
+4. 禁用CPU的保护模式，并使用LGDT（装载全局描述符表寄存器）指令加载GDT表到GDTR寄存器中。
+5. 重新启用CPU的保护模式，此时GDT表已经初始化完成。
+
+##### 具体操作
+
+```
+# Bootstrap GDT
+.p2align 2                                          # force 4 byte alignment
+gdt:
+    SEG_NULLASM                                     # null seg
+    SEG_ASM(STA_X|STA_R, 0x0, 0xffffffff)           # code seg for bootloader and kernel
+    SEG_ASM(STA_W, 0x0, 0xffffffff)                 # data seg for bootloader and kernel
+
+gdtdesc:
+    .word 0x17                                      # sizeof(gdt) - 1
+    .long gdt                                       # address gdt
+```
+
+这段代码是通过使用汇编语言中的宏定义，定义了三个段描述符并存放在gdt数组中，然后将gdt数组的地址和大小存放在gdtdesc数组中。具体解释如下：
+
+- .p2align 2：这个指令告诉汇编器要将下一个指令的地址对齐到4字节的边界。
+- gdt：这是一个标签，定义了一个包含3个段描述符的数组。
+- SEG_NULLASM：这个宏定义创建一个值为0的空段描述符。在GDT表中，第一个段描述符必须是空的，因此使用该宏定义将第一个元素设置为NULL段描述符。
+- SEG_ASM(STA_X|STA_R, 0x0, 0xffffffff)：这个宏定义创建一个代码段描述符，包括代码段基地址为0，段限长为0xffffffff，访问权限设置为可读可执行（STA_X|STA_R）。
+- SEG_ASM(STA_W, 0x0, 0xffffffff)：这个宏定义创建一个数据段描述符，包括数据段基地址为0，段限长为0xffffffff，访问权限设置为可写（STA_W）。
+- gdtdesc：这是一个标签，定义了一个包含两个字（word）和一个双字（long）的数组，其中第一个字表示GDT表的大小，第二个双字表示GDT表的地址。
+- .word 0x17：这个字表示GDT表的大小（3 * 8 - 1），其中3表示GDT表中包含3个段描述符，8表示每个段描述符的大小。
+- .long gdt：这个双字表示GDT表的地址，指向gdt数组的首地址。
+
+因此，这段代码初始化了一个包含3个段描述符的GDT表，其中第一个段描述符为NULL段描述符，第二个段描述符为可执行的代码段描述符，第三个段描述符为可写的数据段描述符。同时，gdtdesc数组存储了GDT表的大小和地址信息，便于将该GDT表加载到处理器的GDTR寄存器中。
+
+#### 解答3
+
+使能和进入保护模式需要进行以下步骤：
+
+1. 初始化GDT表：定义GDT表中的段描述符，包括空段描述符和代码和数据段描述符。这些描述符规定了内存中不同段的起始地址、大小和访问权限等属性。
+2. 加载GDT表：使用LGDT指令将GDT表的地址和大小（即gdtdesc中的值）加载到GDTR寄存器中。
+3. 设置CR0寄存器：将CR0寄存器的第0位设置为1，开启保护模式。同时，将CR0寄存器的第16位（即WP位）设置为1，启用写保护模式。
+4. 进入保护模式：使用汇编指令jmp指令跳转到保护模式代码段的起始地址。此时处理器将处于保护模式，操作系统可以运行在受保护的地址空间内。
+
+##### 具体操作
+
+```
+    # Switch from real to protected mode, using a bootstrap GDT
+    # and segment translation that makes virtual addresses
+    # identical to physical addresses, so that the
+    # effective memory map does not change during the switch.
+    lgdt gdtdesc
+    movl %cr0, %eax
+    orl $CR0_PE_ON, %eax
+    movl %eax, %cr0
+
+    # Jump to next instruction, but in 32-bit code segment.
+    # Switches processor into 32-bit mode.
+    ljmp $PROT_MODE_CSEG, $protcseg
+
+.code32                                             # Assemble for 32-bit mode
+protcseg:
+    # Set up the protected-mode data segment registers
+    movw $PROT_MODE_DSEG, %ax                       # Our data segment selector
+    movw %ax, %ds                                   # -> DS: Data Segment
+    movw %ax, %es                                   # -> ES: Extra Segment
+    movw %ax, %fs                                   # -> FS
+    movw %ax, %gs                                   # -> GS
+    movw %ax, %ss                                   # -> SS: Stack Segment
+
+    # Set up the stack pointer and call into C. The stack region is from 0--start(0x7c00)
+    movl $0x0, %ebp
+    movl $start, %esp
+    call bootmain
+
+    # If bootmain returns (it shouldn't), loop.
+spin:
+    jmp spin
+```
+
+这段代码使能和进入保护模式的具体步骤如下：
+
+1. 加载GDT表：首先通过 `lgdt` 指令加载 GDT 描述符（`gdtdesc`）中的 GDT 表，告诉处理器要使用哪些段描述符以及每个段描述符的位置和属性。
+2. 打开保护模式：将 `cr0` 控制寄存器的 `PE` 位设置为1，以使能保护模式。
+3. 切换到保护模式：使用 `ljmp` 指令跳转到 `protcseg` 标号所在地址，跳转的目的是为了将处理器切换到 32 位代码段（`PROT_MODE_CSEG`）。
+4. 设置段寄存器：切换到保护模式后，需要重新设置段寄存器，以便使用新的段描述符表。首先将数据段选择符（`PROT_MODE_DSEG`）存储到 `ax` 寄存器中，然后分别将其存储到 `ds`、`es`、`fs`、`gs`、`ss` 寄存器中。
+5. 设置栈指针：在 16 位实模式下，栈指针一般设置在内存的顶端（0x9ffff），而在保护模式下，需要根据实际情况设置栈指针。这里将栈指针 `esp` 设置为 `start` 标号所在地址（0x7c00），栈区间为从0到0x7c00的地址空间。
+6. 调用 C 函数：设置好栈指针后，调用 `bootmain` 函数，进入内核启动过程。
+7. 循环等待：如果 `bootmain` 函数返回，说明出现了错误，跳转到 `spin` 标号所在地址，进行循环等待。
