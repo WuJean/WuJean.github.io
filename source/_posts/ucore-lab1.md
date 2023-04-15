@@ -165,7 +165,7 @@ cd labcodes/lab1/
 
 前往lab1的源代码目录。
 
-### 练习1 理解通过make生成执行文件的过程
+### 练习1 
 
 #### 题目
 
@@ -424,7 +424,7 @@ debug-nox: $(UCOREIMG)
 修改`tools/gdbinit`的内容：
 
 ```
-file bin/kernel
+file bin/kerne、
 target remote :1234
 set architecture i8086
 break kern_init
@@ -473,7 +473,9 @@ lab1_asm.log是生成的日志文件名称，其中记录了使用-d选项生成
 
 #### 解答4
 
+make debug
 
+自己找一个函数打断点分析截图
 
 ### 练习3 分析bootloader进入保护模式的过程
 
@@ -579,7 +581,7 @@ seta20.2:
 
 #### 解答2
 
-在x86架构的计算机系统中，GDT（全局描述符表）是一个系统级别的数据结构，用于存储操作系统和应用程序的内存分段信息。GDT表的初始化是操作系统引导过程中的一个重要步骤。
+在x86架构的计算机系统中，GDT（全局描述符表）是一个系统级别的数据结构，用于**存储操作系统和应用程序的内存分段信息**。GDT表的初始化是操作系统引导过程中的一个重要步骤。
 
 以下是GDT表的初始化步骤：
 
@@ -671,3 +673,547 @@ spin:
 5. 设置栈指针：在 16 位实模式下，栈指针一般设置在内存的顶端（0x9ffff），而在保护模式下，需要根据实际情况设置栈指针。这里将栈指针 `esp` 设置为 `start` 标号所在地址（0x7c00），栈区间为从0到0x7c00的地址空间。
 6. 调用 C 函数：设置好栈指针后，调用 `bootmain` 函数，进入内核启动过程。
 7. 循环等待：如果 `bootmain` 函数返回，说明出现了错误，跳转到 `spin` 标号所在地址，进行循环等待。
+
+### 练习4
+
+#### 题目
+
+通过阅读bootmain.c，了解bootloader如何加载ELF文件。通过分析源代码和通过qemu来运行并调试bootloader&OS，
+
+- bootloader如何读取硬盘扇区的？
+- bootloader是如何加载ELF格式的OS？
+
+提示：可阅读“硬盘访问概述”，“ELF执行文件格式概述”这两小节。
+
+#### 解答1
+
+bootloader让CPU进入保护模式后，下一步的工作就是从硬盘上加载并运行OS。考虑到实现的简单性，bootloader的访问硬盘都是LBA模式的PIO（Program IO）方式，即所有的IO操作是通过CPU访问硬盘的IO地址寄存器完成。
+
+磁盘IO地址和对应功能：
+
+第6位：为1=LBA模式；0 = CHS模式 第7位和第5位必须为1
+
+| IO地址 | 功能                                                         |
+| ------ | ------------------------------------------------------------ |
+| 0x1f0  | 读数据，当0x1f7不为忙状态时，可以读。                        |
+| 0x1f2  | 要读写的扇区数，每次读写前，你需要表明你要读写几个扇区。最小是1个扇区 |
+| 0x1f3  | 如果是LBA模式，就是LBA参数的0-7位                            |
+| 0x1f4  | 如果是LBA模式，就是LBA参数的8-15位                           |
+| 0x1f5  | 如果是LBA模式，就是LBA参数的16-23位                          |
+| 0x1f6  | 第0~3位：如果是LBA模式就是24-27位 第4位：为0主盘；为1从盘    |
+| 0x1f7  | 状态和命令寄存器。操作时先给命令，再读取，如果不是忙状态就从0x1f0端口读数据 |
+
+当前 硬盘数据是储存到硬盘扇区中，一个扇区大小为512字节。读一个扇区的流程（可参看boot/bootmain.c中的readsect函数实现）大致如下：
+
+1. 等待磁盘准备好
+2. 发出读取扇区的命令
+3. 等待磁盘准备好
+4. 把磁盘扇区数据读到指定内存
+
+##### 具体解答
+
+```
+/* waitdisk - wait for disk ready */
+static void
+waitdisk(void) {
+    // 判断磁盘是否处于忙碌状态
+    while ((inb(0x1F7) & 0xC0) != 0x40)
+        /* do nothing */;
+}
+
+/* readsect - read a single sector at @secno into @dst */
+static void
+readsect(void *dst, uint32_t secno) {
+    //等待磁盘准备好
+    waitdisk();
+
+    // 设置磁盘参数
+    outb(0x1F2, 1);          // 往0X1F2地址中写入要读取的扇区数，由于此处需要读一个扇区，因此参数为1
+
+    // 0x1F3-0x1F6 设置LBA模式的参数
+    outb(0x1F3, secno & 0xFF);                // 输入LBA参数的0-7位
+    outb(0x1F4, (secno >> 8) & 0xFF);        // 输入LBA参数的8-15位
+    outb(0x1F5, (secno >> 16) & 0xFF);        // 输入LBA参数的16-23位
+    outb(0x1F6, ((secno >> 24) & 0xF) | 0xE0);    // 输入LBA参数的24-27位（对应到0-3位），第四位为0表示从主盘读取，其余位被强制置为1
+    outb(0x1F7, 0x20);                      // 发出读取扇区的指令
+
+    //等待磁盘准备好
+    waitdisk();
+
+    // 从0x1F0端口处读数据，除以4是因为此处是以4个字节为单位的
+    insl(0x1F0, dst, SECTSIZE / 4);
+}
+```
+
+各地址代表的寄存器意义如下：
+
+- 0x1F0 R，当 0x1F7 不为忙状态时可以读
+- 0x1F2 R/W，扇区数寄存器，记录操作的扇区数
+- 0x1F3 R/W，扇区号寄存器，记录操作的起始扇区号
+- 0x1F4 R/W，柱面号寄存器，记录柱面号的低 8 位
+- 0x1F5 R/W，柱面号寄存器，记录柱面号的高 8 位
+- 0x1F6 R/W，驱动器/磁头寄存器，记录操作的磁头号、驱动器号和寻道方式，前 4 位代表逻辑扇区号的高 4 位，DRV = 0/1 代表主/从驱动器，LBA = 0/1 代表 CHS/LBA 方式。
+- 0x1F7 R，状态寄存器，第 6、7 位分别代表驱动器准备好/驱动器忙
+- 0x1F8 W，命令寄存器，0x20 命令代表读取扇区
+
+`readseg`封装了`readsect`，通过迭代使其可以读取`任意长度`的内容，代码如下：
+
+```c
+/* *
+* readseg - read @count bytes at @offset from kernel into virtual address @va,
+* might copy more than asked.
+* */
+static void
+readseg(uintptr_t va, uint32_t count, uint32_t offset) {
+    uintptr_t end_va = va + count;
+
+    // round down to sector boundary
+    va -= offset % SECTSIZE;
+
+    // translate from bytes to sectors; kernel starts at sector 1
+    uint32_t secno = (offset / SECTSIZE) + 1;
+
+    // If this is too slow, we could read lots of sectors at a time.
+    // We'd write more to memory than asked, but it doesn't matter --
+    // we load in increasing order.
+    for (; va < end_va; va += SECTSIZE, secno ++) {
+        readsect((void *)va, secno);
+    }
+}
+```
+
+这段代码的具体实现：
+
+1. 计算读取数据的结束虚拟地址 end_va = va + count；
+2. 将起始虚拟地址 va 向下取整到扇区边界；
+3. 计算偏移量对应的扇区号 secno = (offset / SECTSIZE) + 1；
+4. 使用循环依次读取每个扇区，并将其复制到虚拟地址空间中：
+   - 循环条件：当 va < end_va 时继续循环；
+   - 循环迭代操作：将 va 增加一个扇区大小，即 SECTSIZE；将扇区号 secno 增加1；
+   - 循环体内操作：调用 readsect 函数，将当前扇区的内容读取到虚拟地址 va 对应的内存中。readsect 函数将从磁盘中读取一个扇区的内容，并将其复制到给定的缓冲区中。
+
+#### 解答2
+
+首先看`elfhdr`、`proghdr`相关的信息，`libs/elf.h`代码如下：
+
+```
+#ifndef __LIBS_ELF_H__
+#define __LIBS_ELF_H__
+
+#include <defs.h>
+
+#define ELF_MAGIC    0x464C457FU            // 小端格式下"\x7FELF"
+
+/* 文件头 */
+struct elfhdr {
+    uint32_t e_magic;     // 必须等于ELF_MAGIC魔数
+    uint8_t e_elf[12];    // 12 字节，每字节对应意义如下：
+// 0 : 1 = 32 位程序；2 = 64 位程序
+// 1 : 数据编码方式，0 = 无效；1 = 小端模式；2 = 大端模式
+// 2 : 只是版本，固定为 0x1
+// 3 : 目标操作系统架构
+// 4 : 目标操作系统版本
+// 5 ~ 11 : 固定为 0
+
+    uint16_t e_type;      // 1=可重定位, 2=可执行, 3=共享对象, 4=核心镜像
+    uint16_t e_machine;   // 3=x86, 4=68K, etc.
+    uint32_t e_version;   // 文件版本，总为1
+    uint32_t e_entry;     // 程序入口地址（如果可执行）
+    uint32_t e_phoff;     // 程序段表头相对elfhdr偏移位置
+    uint32_t e_shoff;     // 节头表相对elfhdr偏移量
+    uint32_t e_flags;     // 处理器特定标志，通常为0
+    uint16_t e_ehsize;    // 这个ELF头的大小
+    uint16_t e_phentsize; // 程序头部长度
+    uint16_t e_phnum;     // 段个数
+    uint16_t e_shentsize; // 节头部长度
+    uint16_t e_shnum;     // 节头部个数
+    uint16_t e_shstrndx;  // 节头部字符索引
+};
+
+/* 程序段表头 */
+struct proghdr {
+    uint32_t p_type;   // 段类型
+// 1 PT_LOAD : 可载入的段
+// 2 PT_DYNAMIC : 动态链接信息
+// 3 PT_INTERP : 指定要作为解释程序调用的以空字符结尾的路径名的位置和大小
+// 4 PT_NOTE : 指定辅助信息的位置和大小
+// 5 PT_SHLIB : 保留类型，但具有未指定的语义
+// 6 PT_PHDR : 指定程序头表在文件及程序内存映像中的位置和大小
+// 7 PT_TLS : 指定线程局部存储模板
+
+    uint32_t p_offset; // 段相对文件头的偏移值
+    uint32_t p_va;     // 段的第一个字节将被放到内存中的虚拟地址
+    uint32_t p_pa;     //段的第一个字节在内存中的物理地址
+    uint32_t p_filesz; //段在文件中的长度
+    uint32_t p_memsz;  // 段在内存映像中占用的字节数
+    uint32_t p_flags;  //可读可写可执行标志位。
+    uint32_t p_align;   //段在文件及内存的对齐方式
+};
+
+#endif /* !__LIBS_ELF_H__ */
+```
+
+结合`boot/bootmain.c`代码分析：
+
+```
+#define SECTSIZE        512
+#define ELFHDR          ((struct elfhdr *)0x10000)
+
+/* bootmain - the entry of bootloader */
+void
+bootmain(void) {
+    // read the 1st page off disk
+    readseg((uintptr_t)ELFHDR, SECTSIZE * 8, 0);    //bootloader先将ELF格式的OS加载到地址0x10000
+
+    // is this a valid ELF?
+    // 通过储存在头部的幻数判断读入的ELF文件是否合法
+    if (ELFHDR->e_magic != ELF_MAGIC) {
+        goto bad;
+    }
+
+    struct proghdr *ph, *eph;
+
+    // load each program segment (ignores ph flags)
+    // 按照描述表将ELF文件中数据载入内存，将ELF中每个段都加载到特定的地址
+    // ELF文件0x1000位置后面的0xd1ec比特被载入内存0x00100000
+// ELF文件0xf000位置后面的0x1d20比特被载入内存0x0010e000
+    ph = (struct proghdr *)((uintptr_t)ELFHDR + ELFHDR->e_phoff);
+    eph = ph + ELFHDR->e_phnum;
+    for (; ph < eph; ph ++) {
+        readseg(ph->p_va & 0xFFFFFF, ph->p_memsz, ph->p_offset);
+    }
+
+    // call the entry point from the ELF header
+    // note: does not return
+    // 跳转至ELF文件的程序入口点
+    ((void (*)(void))(ELFHDR->e_entry & 0xFFFFFF))();
+
+bad:
+    outw(0x8A00, 0x8A00);
+    outw(0x8A00, 0x8E00);
+
+    /* do nothing */
+    while (1);
+}
+```
+
+当计算机开机时，CPU 会读取 ROM 芯片中的代码，这段代码会在内存中建立起一个最小的操作系统，称为 bootloader。在加载 ELF 格式的操作系统时，bootloader 需要进行以下几个步骤：
+
+1. 解析 ELF 文件格式：bootloader 会读取 ELF 文件头部，解析其中的信息，如入口地址、程序头表和节头表等。
+2. 加载操作系统代码到内存：根据 ELF 文件头部中的入口地址，bootloader 会将操作系统代码从磁盘中加载到内存中的指定地址，一般是加载到内存的高地址空间。
+3. 设置操作系统环境：在加载操作系统代码之前，bootloader 会设置一些操作系统需要的环境变量，如根文件系统的位置、系统内存大小等等。
+4. 跳转到操作系统入口地址：当操作系统代码被加载到内存之后，bootloader 会跳转到操作系统的入口地址，将控制权交给操作系统。此时，操作系统便开始执行自己的代码了。
+
+### 练习5
+
+#### 题目
+
+在lab1中完成kdebug.c中函数print_stackframe的实现，可以通过函数print_stackframe来跟踪函数调用堆栈中记录的返回地址。
+
+在lab1中执行 “make qemu”后，在qemu模拟器中得到类似如下的输出：
+
+```
+……
+ebp:0x00007b28 eip:0x00100992 args:0x00010094 0x00010094 0x00007b58 0x00100096
+    kern/debug/kdebug.c:305: print_stackframe+22
+ebp:0x00007b38 eip:0x00100c79 args:0x00000000 0x00000000 0x00000000 0x00007ba8
+    kern/debug/kmonitor.c:125: mon_backtrace+10
+ebp:0x00007b58 eip:0x00100096 args:0x00000000 0x00007b80 0xffff0000 0x00007b84
+    kern/init/init.c:48: grade_backtrace2+33
+ebp:0x00007b78 eip:0x001000bf args:0x00000000 0xffff0000 0x00007ba4 0x00000029
+    kern/init/init.c:53: grade_backtrace1+38
+ebp:0x00007b98 eip:0x001000dd args:0x00000000 0x00100000 0xffff0000 0x0000001d
+    kern/init/init.c:58: grade_backtrace0+23
+ebp:0x00007bb8 eip:0x00100102 args:0x0010353c 0x00103520 0x00001308 0x00000000
+    kern/init/init.c:63: grade_backtrace+34
+ebp:0x00007be8 eip:0x00100059 args:0x00000000 0x00000000 0x00000000 0x00007c53
+    kern/init/init.c:28: kern_init+88
+ebp:0x00007bf8 eip:0x00007d73 args:0xc031fcfa 0xc08ed88e 0x64e4d08e 0xfa7502a8
+<unknow>: -- 0x00007d72 –
+……
+```
+
+并解释最后一行各个数值的含义。
+
+提示：可阅读小节“函数堆栈”，了解编译器如何建立函数调用关系的。在完成lab1编译后，查看lab1/obj/bootblock.asm，了解bootloader源码与机器码的语句和地址等的对应关系；查看lab1/obj/kernel.asm，了解 ucore OS源码与机器码的语句和地址等的对应关系。
+
+补充材料：
+
+由于显示完整的栈结构需要解析内核文件中的调试符号，较为复杂和繁琐。代码中有一些辅助函数可以使用。例如可以通过调用print_debuginfo函数完成查找对应函数名并打印至屏幕的功能。具体可以参见kdebug.c代码中的注释。
+
+##### 具体实现
+
+前往`ucore/labcodes/lab1/kern/debug`中找到`kdebug.c`：
+
+代码已经写好注释，按照逻辑编写即可：
+
+```
+void
+print_stackframe(void) {
+     /* LAB1 YOUR CODE : STEP 1 */
+     /* (1) call read_ebp() to get the value of ebp. the type is (uint32_t);
+      * (2) call read_eip() to get the value of eip. the type is (uint32_t);
+      * (3) from 0 .. STACKFRAME_DEPTH
+      *    (3.1) printf value of ebp, eip
+      *    (3.2) (uint32_t)calling arguments [0..4] = the contents in address (unit32_t)ebp +2 [0..4]
+      *    (3.3) cprintf("\n");
+      *    (3.4) call print_debuginfo(eip-1) to print the C calling function name and line number, etc.
+      *    (3.5) popup a calling stackframe
+      *           NOTICE: the calling funciton's return addr eip  = ss:[ebp+4]
+      *                   the calling funciton's ebp = ss:[ebp]
+      */
+   	uint32_t ebp = read_ebp();
+	uint32_t eip = read_eip();
+	int i, j;
+	for(i = 0; i < STACKFRAME_DEPTH && ebp != 0; i++) {
+		cprintf("ebp:0x%08x eip:0x%08x", ebp, eip);
+		uint32_t *arg = (uint32_t *)ebp + 2;			//第一个参数的位置
+		cprintf(" arg:");
+		for(j = 0; j < 4; j++) {
+			cprintf("0x%08x ", arg[j]);
+		}
+		cprintf("\n");
+		print_debuginfo(eip - 1);
+		eip = ((uint32_t *)ebp)[1];
+		ebp = ((uint32_t*)ebp)[0];
+	}
+}
+```
+
+切换栈帧的过程可以分为以下几个步骤：
+
+1. 从栈帧中读取调用该函数的函数的基指针（ebp）和返回地址（eip）。
+2. 将eip设置为即将执行的指令，需要减1才能打印当前函数的信息。
+3. 将ebp设置为调用该函数的函数的基指针，这样可以访问该函数的参数和局部变量。
+
+代码 `ebp = *(uint32_t *)ebp;` 的作用是将ebp设置为当前ebp指向的位置，也就是上一个栈帧的基指针的位置。这样，下一次循环就可以访问上一个栈帧的参数和局部变量。
+
+在第一次循环中，**当前ebp的值**是调用 `print_stackframe` 函数时的基指针。通过将ebp指向上一个栈帧的基指针的位置，就可以访问调用 `print_stackframe` 函数时的栈帧中的参数和局部变量。
+
+在lab1目录下执行：
+
+```
+$ make qemu
+```
+
+```
+Special kernel symbols:
+  entry  0x00100000 (phys)
+  etext  0x001039ae (phys)
+  edata  0x0010f950 (phys)
+  end    0x00110da8 (phys)
+Kernel executable memory footprint: 68KB
+ebp:0x00007b38 eip:0x00100ad7 arg:0x00010094 0x0010f950 0x00007b68 0x001000a4 
+    kern/debug/kdebug.c:306: print_stackframe+33
+ebp:0x00007b48 eip:0x00100e69 arg:0x00000000 0x00000000 0x00000000 0x0010008f 
+    kern/debug/kmonitor.c:125: mon_backtrace+23
+ebp:0x00007b68 eip:0x001000a4 arg:0x00000000 0x00007b90 0xffff0000 0x00007b94 
+    kern/init/init.c:48: grade_backtrace2+32
+ebp:0x00007b88 eip:0x001000d3 arg:0x00000000 0xffff0000 0x00007bb4 0x001000e7 
+    kern/init/init.c:53: grade_backtrace1+37
+ebp:0x00007ba8 eip:0x001000fa arg:0x00000000 0x00100000 0xffff0000 0x0010010b 
+    kern/init/init.c:58: grade_backtrace0+29
+ebp:0x00007bc8 eip:0x00100126 arg:0x00000000 0x00000000 0x00000000 0x001039b0 
+    kern/init/init.c:63: grade_backtrace+37
+ebp:0x00007be8 eip:0x00100068 arg:0x00000000 0x00000000 0x00000000 0x00007c4f 
+    kern/init/init.c:28: kern_init+103
+ebp:0x00007bf8 eip:0x00007d6e arg:0xc031fcfa 0xc08ed88e 0x64e4d08e 0xfa7502a8 
+    <unknow>: -- 0x00007d6d --
+```
+
+**最后一行的含义是：**最初使用堆栈的那一个函数，即`bootmain`。 bootloader 设置的堆栈从`0x7c00`开始，使用`call bootmain`进入`bootmain`函数。 call 指令压栈，所以`bootmain`中`ebp`为`0x7bf8`。后面的`unknow`之后的`0x00007d71`是`bootmain`函数内**调用 OS kernel 入口函数**的`指令的地址`。`eip`则为`0x00007d71`的下一条地址，即`0x00007d72`。后面的`args`则表示传递给`bootmain`函数的参数，但是由于`bootmain`函数不需要任何参数，因此这些打印出来的数值并没有实际意义。(学长写的真的好好)
+
+### 练习6
+
+#### 题目
+
+请完成编码工作和回答如下问题：
+
+1. 中断描述符表（也可简称为保护模式下的中断向量表）中一个表项占多少字节？其中哪几位代表中断处理代码的入口？
+2. 请编程完善kern/trap/trap.c中对中断向量表进行初始化的函数idt_init。在idt_init函数中，依次对所有中断入口进行初始化。使用mmu.h中的SETGATE宏，填充idt数组内容。每个中断的入口由tools/vectors.c生成，使用trap.c中声明的vectors数组即可。
+3. 请编程完善trap.c中的中断处理函数trap，在对时钟中断进行处理的部分填写trap函数中处理时钟中断的部分，使操作系统每遇到100次时钟中断后，调用print_ticks子程序，向屏幕上打印一行文字”100 ticks”。
+
+【注意】除了系统调用中断(T_SYSCALL)使用陷阱门描述符且权限为用户态权限以外，其它中断均使用特权级(DPL)为０的中断门描述符，权限为内核态权限；而ucore的应用程序处于特权级３，需要采用｀int 0x80`指令操作（这种方式称为软中断，软件中断，Tra中断，在lab5会碰到）来发出系统调用请求，并要能实现从特权级３到特权级０的转换，所以系统调用中断(T_SYSCALL)所对应的中断门描述符中的特权级（DPL）需要设置为３。
+
+#### 解答1
+
+在`kern/mm/mmu.h`中可以找到表项的结构代码如下：
+
+```
+/* Gate descriptors for interrupts and traps */
+struct gatedesc {
+    unsigned gd_off_15_0 : 16;        // low 16 bits of offset in segment
+    unsigned gd_ss : 16;            // segment selector
+    unsigned gd_args : 5;            // # args, 0 for interrupt/trap gates
+    unsigned gd_rsv1 : 3;            // reserved(should be zero I guess)
+    unsigned gd_type : 4;            // type(STS_{TG,IG32,TG32})
+    unsigned gd_s : 1;                // must be 0 (system)
+    unsigned gd_dpl : 2;            // descriptor(meaning new) privilege level
+    unsigned gd_p : 1;                // Present
+    unsigned gd_off_31_16 : 16;        // high bits of offset in segment
+};
+```
+
+中断向量表一个表项的大小为`16+16+5+3+4+1+2+1+16=8*8=64`bit，即**8 字节**。其中**0-15 位**和**48-63 位**分别为**偏移量的低 16 位和高 16 位**，两者拼接得到**段内偏移量**，**16-31 位**`gd_ss`为**段选择器**。根据**段选择子**和**段内偏移地址**就可以得出**中断处理程序的地址**。
+
+#### 解答2
+
+实现后的`idt_init`代码如下：
+
+```
+/* idt_init - initialize IDT to each of the entry points in kern/trap/vectors.S */
+void idt_init(void)
+{
+    /* LAB1 YOUR CODE : STEP 2 */
+    /* (1) Where are the entry addrs of each Interrupt Service Routine (ISR)?
+    *     All ISR's entry addrs are stored in __vectors. where is uintptr_t __vectors[] ?
+    *     __vectors[] is in kern/trap/vector.S which is produced by tools/vector.c
+    *     (try "make" command in lab1, then you will find vector.S in kern/trap DIR)
+    *     You can use  "extern uintptr_t __vectors[];" to define this extern variable which will be used later.
+    * (2) Now you should setup the entries of ISR in Interrupt Description Table (IDT).
+    *     Can you see idt[256] in this file? Yes, it's IDT! you can use SETGATE macro to setup each item of IDT
+    * (3) After setup the contents of IDT, you will let CPU know where is the IDT by using 'lidt' instruction.
+    *     You don't know the meaning of this instruction? just google it! and check the libs/x86.h to know more.
+    *     Notice: the argument of lidt is idt_pd. try to find it!
+    */
+
+    extern uintptr_t __vectors[]; //声明中断入口，__vectors定义于vector.S中
+    uint32_t i;
+    for (i = 0; i < (sizeof(idt) / sizeof(struct gatedesc)); i++)
+    {
+    // 该idt项为内核代码，所以使用GD_KTEXT段选择子
+    // 中断处理程序的入口地址存放于__vectors[i]
+    // 特权级为DPL_KERNEL
+        SETGATE(idt[i], 0, GD_KTEXT, __vectors[i], DPL_KERNEL); //为中断程序设置内核态权限
+    }
+    SETGATE(idt[T_SYSCALL], 0, GD_KTEXT, __vectors[T_SYSCALL], DPL_USER); //为T_SYSCALL设置用户态权限
+    lidt(&idt_pd); //使用lidt指令加载中断描述符表
+}
+```
+
+**传入`SETGATE`的参数：**
+
+- 第一个参数 gate 是中断描述符表
+- 第二个参数 istrap 用来判断是中断还是 trap
+- 第三个参数 sel 的作用是进行段的选择
+- 第四个参数 off 表示偏移
+- 第五个参数 dpl 表示中断的优先级
+
+这段代码用于初始化中断描述符表（IDT），将每个中断服务例程（ISR）的入口地址设置到IDT中。这些ISR的入口地址定义在`kern/trap/vectors.S`文件中。代码通过循环遍历IDT中的每个项，使用`SETGATE`宏将ISR的入口地址、段选择子、特权级等信息设置到对应IDT项中。其中，对于内核代码ISR，特权级设置为内核态权限，而对于用户态ISR，特权级设置为用户态权限。最后，使用`lidt`指令将IDT的地址加载到中央处理器中。
+
+#### 解答3
+
+由于所有中断最后都是统一在`trap_dispatch`中进行处理或者分配的，因此不妨考虑在该函数中对应处理时钟中断的部分，对全局变量`ticks`加 1，并且当计数`到达100时`，调用`print_ticks`函数，从而完成每隔一段时间打印`100 ticks`的功能。
+
+**实现后的`trap_dispatch`代码如下**：
+
+```
+/* trap_dispatch - dispatch based on what type of trap occurred */
+static void
+trap_dispatch(struct trapframe *tf)
+{
+    char c;
+
+    switch (tf->tf_trapno)
+    {
+    case IRQ_OFFSET + IRQ_TIMER:
+        /* LAB1 YOUR CODE : STEP 3 */
+        /* handle the timer interrupt */
+        /* (1) After a timer interrupt, you should record this event using a global variable (increase it), such as ticks in kern/driver/clock.c
+        * (2) Every TICK_NUM cycle, you can print some info using a funciton, such as print_ticks().
+        * (3) Too Simple? Yes, I think so!
+        */
+
+        // 全局变量ticks定义于kern/driver/clock.c
+        ticks++;
+        if (ticks % TICK_NUM == 0)//每次时钟中断之后ticks就会加1，当加到TICK_NUM次数时，打印ticks并重新开始
+            print_ticks();//打印ticks
+        break;
+    case IRQ_OFFSET + IRQ_COM1:
+        c = cons_getc();
+        cprintf("serial [%03d] %c\n", c, c);
+        break;
+    case IRQ_OFFSET + IRQ_KBD:
+        c = cons_getc();
+        cprintf("kbd [%03d] %c\n", c, c);
+        break;
+    //LAB1 CHALLENGE 1 : YOUR CODE you should modify below codes.
+    case T_SWITCH_TOU:
+    case T_SWITCH_TOK:
+        panic("T_SWITCH_** ??\n");
+        break;
+    case IRQ_OFFSET + IRQ_IDE1:
+    case IRQ_OFFSET + IRQ_IDE2:
+        /* do nothing */
+        break;
+    default:
+        // in kernel, it must be a mistake
+        if ((tf->tf_cs & 3) == 0)
+        {
+            print_trapframe(tf);
+            panic("unexpected trap in kernel.\n");
+        }
+    }
+}
+```
+
+这段代码是一个中断处理函数，根据不同的中断类型进行分发。在函数中使用了一个switch语句，根据中断号判断所发生的中断类型，并执行相应的处理代码。
+
+对于时钟中断IRQ_TIMER，该函数会将全局变量ticks加1，如果当前的ticks是TICK_NUM的倍数，则调用print_ticks()函数打印ticks的值。
+
+对于键盘中断IRQ_KBD和串口中断IRQ_COM1，函数会分别调用cons_getc()函数获取用户输入的字符，并使用cprintf()函数输出到控制台。
+
+对于其他中断类型，如果发生在内核态，则会调用panic()函数输出异常信息并触发内核恐慌。如果发生在用户态，则什么也不做，让用户程序自行处理中断。此外，代码还包含了一个switch语句中的default分支，用于处理未知的中断类型。
+
+# 总结
+
+操作系统是一个软件，也需要通过某种机制加载并运行它。在这里我们将通过另外一个更加简单的软件-bootloader来完成这些工作。为此，我们需要完成一个能够切换到x86的保护模式并显示字符的bootloader，为启动操作系统ucore做准备。lab1提供了一个非常小的bootloader和ucore OS，整个bootloader执行代码小于512个字节，这样才能放到硬盘的主引导扇区中。通过分析和实现这个bootloader和ucore OS，读者可以了解到：
+
+- 计算机原理
+  - CPU的编址与寻址: 基于分段机制的内存管理
+  - CPU的中断机制
+  - 外设：串口/并口/CGA，时钟，硬盘
+- Bootloader软件
+  - 编译运行bootloader的过程
+  - 调试bootloader的方法
+  - PC启动bootloader的过程
+  - ELF执行文件的格式和加载
+  - 外设访问：读硬盘，在CGA上显示字符串
+- ucore OS软件
+  - 编译运行ucore OS的过程
+  - ucore OS的启动过程
+  - 调试ucore OS的方法
+  - 函数调用关系：在汇编级了解函数调用栈的结构和处理过程
+  - 中断管理：与软件相关的中断处理
+  - 外设管理：时钟
+
+## 练习概述
+
+- 练习1：理解通过make生成执行文件的过程
+  - Makefile
+    - 了解Makefile的组成结构
+    - make的细节
+  - 硬盘主引导扇区
+
+- 练习2：使用qemu执行并调试lab1中的软件
+  - 单步跟踪BIOS的执行
+    - 了解qemu的原理（安卓模拟器-》内核模拟器）
+    - 了解gdb远程调试及调试命令
+    - 修改gdbinit
+  - 修改Makefile中的debug选项
+    - 添加调试日记（反汇编程序）的内容
+    - 对比反汇编日志和源代码的区别
+- 练习3：分析bootloader进入保护模式的过程（阅读源代码 boot/bootasm.S）
+  - 了解保护模式和分段机制
+    - 实模式-》保护模式
+  - 为何开启A20，以及如何开启A20
+  - 初始化GDT表
+  - 进入保护模式
+- 练习4：分析bootloader加载ELF格式的OS的过程
+  - 从硬盘上加载并运行OS
+    - 了解ELF格式（阅读源代码 bootmain.c）
+    - 加载的操作（阅读源代码 boot/bootmain.c）
+- 练习5：实现函数调用堆栈跟踪函数（ucore/labcodes/lab1/kern/debug/kdebug.c）
+  - 了解栈帧的操作
+  - 了解操作系统启动时的栈帧调度
+- 练习6：完善中断初始化和处理
