@@ -2,7 +2,7 @@
 title: ucore-lab0 and 1
 date: 2023-04-10 23:24:12
 updated:
-tags:
+tags: ucore
 categories:
 keywords:
 description:

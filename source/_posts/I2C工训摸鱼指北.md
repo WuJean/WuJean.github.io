@@ -2,7 +2,7 @@
 title: I2C工训摸鱼指北
 date: 2023-03-31 10:23:54
 updated:
-tags:
+tags: HNU
 categories:
 keywords:
 description:
