@@ -376,6 +376,44 @@ func4(int a, int b, int c){
 
 故只有12 和 13符合条件，第二个数固定为3
 
+## 另一个题
+
+```
+fun4(int i,int b)
+
+if(i==0) return 0;
+
+if(i==1) return b;
+
+int tmp1 = fun4(i-1,b)
+
+int di = tmp1+b;
+
+int tmp2 = fun4(i-2,b)
+
+return tmp1+tmp2+b;
+```
+
+1 b+0
+
+2  b+b
+
+3  b+2b+b
+
+4  b+2b+4b
+
+5  b+4b+7b
+
+6  b+7b+12b
+
+7  b+12b+20b
+
+8  b+20b+33b
+
+9  b+33b+54b
+
+88
+
 # Phase 5
 
 查看输入的类型：
@@ -477,7 +515,7 @@ int main(){
 0xffffcf40:     14      15
 ```
 
-输入的第一个数减去1要小于等于5：
+输入的第数减去1要小于等于5：
 
 ```
 20│    0x08048eaa <+57>:    mov    0x10(%esp,%ebx,4),%eax
@@ -487,30 +525,66 @@ int main(){
 
 ```
 phase6(int a[6]){
+	//检查是否有相同元素
     for(int i=0;i!=6;i++){
         for(int j=i;j<=5;j++){
-			if(a[i]==a[j+1]) break;
+			if(a[i]!=a[j+1]) continue;
         }
     }
+    
     int d = 0x804c13c;
-    for(int j=0;j<6;j++){
-        if(a[j]>1){
-            for(int i=j;i!a[j];a++){
-                d = d+8;
-            }
-        }
+    for(int i=0;i<6;i++){
+        int eax = 1;
+        if(a[i]>1){
+        	while(eax!=a[i]){
+        		eax++;
+        		d+=8;		//计算权值的偏移量
+        	}
+        	if(eax==a[i]) a[6+i] = d;		//存放权值的地址
     }
-    for(int i=5;i>=0;i--){
-    	
-    }
+    else a[6+eax] = *d;
+    
 }
 ```
 
 ```
-590 303 523 133 792 783
-1   2   3   4   5   6
-5 6 1 3 2 4
+(gdb) x/12d $esp+0x10
+0xffffcf30:     1       2       3       4
+0xffffcf40:     5       6       134529340       134529352
+0xffffcf50:     134529364       134529376       134529388       134529400
 ```
 
+```
+45│    0x08048ef7 <+134>:   mov    0x28(%esp),%ebx	
+46│    0x08048efb <+138>:   mov    0x2c(%esp),%eax	 
+47│    0x08048eff <+142>:   mov    %eax,0x8(%ebx)	
+48│    0x08048f02 <+145>:   mov    0x30(%esp),%edx	
+49│    0x08048f06 <+149>:   mov    %edx,0x8(%eax)	
+50│    0x08048f09 <+152>:   mov    0x34(%esp),%eax	
+51│    0x08048f0d <+156>:   mov    %eax,0x8(%edx)	
+52│    0x08048f10 <+159>:   mov    0x38(%esp),%edx	
+53│    0x08048f14 <+163>:   mov    %edx,0x8(%eax)
+54│    0x08048f17 <+166>:   mov    0x3c(%esp),%eax		
+55│    0x08048f1b <+170>:   mov    %eax,0x8(%edx)		
+56│    0x08048f1e <+173>:   movl   $0x0,0x8(%eax)		
+57│    0x08048f25 <+180>:   mov    $0x5,%esi			
+58│    0x08048f2a <+185>:   mov    0x8(%ebx),%eax		
+59│    0x08048f2d <+188>:   mov    (%eax),%edx			
+60│    0x08048f2f <+190>:   cmp    %edx,(%ebx)				
+61│    0x08048f31 <+192>:   jge    0x8048f38 <phase_6+199>		//降序排列
+62│    0x08048f33 <+194>:   call   0x80491b6 <explode_bomb>
+63│    0x08048f38 <+199>:   mov    0x8(%ebx),%ebx
+64│    0x08048f3b <+202>:   sub    $0x1,%esi
+65│    0x08048f3e <+205>:   jne    0x8048f2a <phase_6+185>
+66│    0x08048f40 <+207>:   add    $0x44,%esp
+67│    0x08048f43 <+210>:   pop    %ebx
+68│    0x08048f44 <+211>:   pop    %esi
+69│    0x08048f45 <+212>:   ret
+70│ End of assembler dump.
+```
 
+```
+0xffffcf48:     134529340       134529352       134529364       134529376
+0xffffcf58:     134529388       134529400
+```
 
