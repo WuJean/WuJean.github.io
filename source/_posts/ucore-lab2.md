@@ -288,7 +288,7 @@ kern_init --> pmm_init-->page_init-->init_memmap--> pmm_manager-->init_memmap
 3. `page_init()`：用来初始化操作系统中的页面（page）数据结构，其中包括可用页面的列表和映射到物理内存的页面。
 4. `init_memmap()`：用来初始化物理内存映射表，它把操作系统中所有可用的物理内存区域映射到相应的页面。
 5. `pmm_manager()`：是物理内存管理器的方法，用来初始化物理内存管理器所维护的内存映射表。
-6. `init_memmap()` 是一个函数，用于初始化物理内存映射表（physical memory map）。
+6. `init_memmap()` 是一个函数，用于初始化初始化内存映射。
 
 default_init_memmap需要根据page_init函数中传递过来的参数（某个连续地址的空闲块的起始页，页个数）来建立一个连续内存空闲块的双向链表。这里有一个假定page_init函数是按地址**从小到大的顺序**传来的**连续内存空闲块**的。链表头是**free_area.free_list**，链表项是Page数据结构的base->page_link。这样我们就依靠Page数据结构中的成员变量page_link形成了连续内存空闲块列表。
 
@@ -315,6 +315,41 @@ default_init_memmap(struct Page *base, size_t n) {
 如果要分配一个页，那要考虑哪些呢？
 
 ### 考虑实现default_alloc_pages函数
+
+如果要分配一个页，那要考虑哪些呢？
+
+firstfit需要从空闲链表头开始查找最小的地址，通过list_next找到下一个空闲块元素，通过le2page宏可以更加链表元素获得对应的Page指针p。通过p->property可以了解此空闲块的大小。如果>=n，这就找到了！如果<n，则list_next，继续查找。直到list_next== &free_list，这表示找完了一遍了。找到后，就要从新组织空闲块，然后把找到的page返回。所以default_alloc_pages可大致实现如下：
+
+```
+static struct Page *
+default_alloc_pages(size_t n) {
+    if (n > nr_free) {
+        return NULL;
+    }
+    struct Page *page = NULL;
+    list_entry_t *le = &free_list;
+    while ((le = list_next(le)) != &free_list) {
+        struct Page *p = le2page(le, page_link);
+        if (p->property >= n) {
+            page = p;
+            break;
+        }
+    }
+    if (page != NULL) {
+        list_del(&(page->page_link));
+        if (page->property > n) {
+            struct Page *p = page + n;
+            p->property = page->property - n;
+            list_add(&free_list, &(p->page_link));
+        }
+        nr_free -= n;
+        ClearPageProperty(page);
+    }
+    return page;
+}
+```
+
+default_free_pages函数的实现其实是default_alloc_pages的逆过程，不过需要考虑空闲块的合并问题。
 
 - 需要注意实现时尽量多考虑一些边界情况，这样确保软件的鲁棒性
 - 加一些 assert函数，在有错误出现时，能够迅速发现
@@ -608,4 +643,249 @@ boot_pgdir[PDX(VPT)] = PADDR(boot_pgdir) | PTE_P | PTE_W;
 # 练习
 
 ## 练习1 实现 first-fit 连续物理内存分配算法
+
+在实现first fit 内存分配算法的回收函数时，要考虑地址连续的空闲块之间的合并操作。提示:在建立空闲页块链表时，需要按照空闲页块起始地址来排序，形成一个有序的链表。可能会修改default_pmm.c中的default_init，default_init_memmap，default_alloc_pages， default_free_pages等相关函数。请仔细查看和理解default_pmm.c中的注释。
+
+## 解答
+
+###  Prepare
+
+```
+be familiar to the struct list in list.h.
+You should know howto USE: 
+list_init, list_add(list_add_after), list_add_before, list_del, list_next, list_prev
+you can find some MACRO: le2page (in memlayout.h)
+```
+
+### default_pmm.c
+
+```
+* (2) default_init: you can reuse the  demo default_init fun to init the free_list and set nr_free to 0.
+*     free_list is used to record the free mem blocks. nr_free is the total number for free mem blocks.
+```
+
+调用list_init函数建立物理内存页表，页表数为0
+
+```
+static void
+default_init(void) {
+    list_init(&free_list);
+    nr_free = 0;
+}
+```
+
+### default_init_memmap
+
+```
+* (3) default_init_memmap:  CALL GRAPH: kern_init --> pmm_init-->page_init-->init_memmap--> pmm_manager->init_memmap
+ *              This fun is used to init a free block (with parameter: addr_base, page_number).
+ *              First you should init each page (in memlayout.h) in this free block, include:
+ *                  p->flags should be set bit PG_property (means this page is valid. In pmm_init fun (in pmm.c),
+ *                  the bit PG_reserved is setted in p->flags)
+ *                  if this page  is free and is not the first page of free block, p->property should be set to 0.
+ *                  if this page  is free and is the first page of free block, p->property should be set to total num of block.
+ *                  p->ref should be 0, because now p is free and no reference.
+ *                  We can use p->page_link to link this page to free_list, (such as: list_add_before(&free_list, &(p->page_link)); )
+ *              Finally, we should sum the number of free mem block: nr_free+=n
+```
+
+此函数是用来初始化内存映射表的，结合我们了解的前置知识可以知道该函数的设计有两个要点：
+
+- 该映射表中的元素是Page，我们需要注意初始化Page中的几个参数。
+
+  ```
+  struct Page {
+      int ref;        // page frame's reference counter
+      uint32_t flags; // array of flags that describe the status of the page frame
+      unsigned int property;// the num of free block, used in first fit pm manager
+      list_entry_t page_link;// free list link
+  };
+  ```
+
+  - ref表示这页被页表的引用记数
+
+  - flags表示此物理页的状态标记
+
+    进一步查看kern/mm/memlayout.h中的定义，可以看到：
+
+    ```
+    /* Flags describing the status of a page frame */
+    #define PG_reserved                 0       // the page descriptor is reserved for kernel or unusable
+    #define PG_property                 1       // the member 'property' is valid
+    ```
+
+    - bit 1表示此页是否是free的，如果设置为1，表示这页是free的，可以被分配
+    - 如果设置为0，表示这页已经被分配出去了，不能被再二次分配
+
+- 注意初始化第一个Page中独占的两个全局参数：
+
+  - property用来记录某连续内存空闲块的大小（即地址连续的空闲页的个数）（存在于第一个物理表）
+  - page_link是便于把多个连续内存空闲块链接在一起的双向链表指针（存在于第一个物理表）
+
+故我们可以写出以下的函数：
+
+```
+static void
+default_init_memmap(struct Page *base, size_t n) {
+    assert(n > 0);
+    struct Page *p = base;
+    for (; p != base + n; p ++) {
+        assert(PageReserved(p));
+        p->flags = p->property = 0;
+        set_page_ref(p, 0);
+    }
+    base->property = n;
+    SetPageProperty(base);
+    nr_free += n;
+    list_add(&free_list, &(base->page_link));
+}
+```
+
+其中根据实验指导书的设计要求，对多种情况做出了判断，便于我们测试函数模块。
+
+在该函数中我们接受Page的基址，以及一个需要分配的页数，通过循环的方式进行遍历，调用`PageReserved(p)`查看该块 是非 被占用，若 没被占用则使用`p->flags = p->property = 0`对每个块进行初始化标记为已被使用，再使用`set_page_ref(p, 0)`添加引用计数。
+
+完成对要求页数的初始化后，对第一个页进行设置：设置该页表中空闲块的数量`base->property = n;`以及将该页表加入到页目录中，最终完成了一个页表的初始化。
+
+### default_alloc_pages
+
+```
+default_alloc_pages: search find a first free block (block size >=n) in free list and reszie the free block, return the addr
+ *              of malloced block.
+ *              (4.1) So you should search freelist like this:
+ *                       list_entry_t le = &free_list;
+ *                       while((le=list_next(le)) != &free_list) {
+ *                       ....
+ *                 (4.1.1) In while loop, get the struct page and check the p->property (record the num of free block) >=n?
+ *                       struct Page *p = le2page(le, page_link);
+ *                       if(p->property >= n){ ...
+ *                 (4.1.2) If we find this p, then it' means we find a free block(block size >=n), and the first n pages can be malloced.
+ *                     Some flag bits of this page should be setted: PG_reserved =1, PG_property =0
+ *                     unlink the pages from free_list
+ *                     (4.1.2.1) If (p->property >n), we should re-caluclate number of the the rest of this free block,
+ *                           (such as: le2page(le,page_link))->property = p->property - n;)
+ *                 (4.1.3)  re-caluclate nr_free (number of the the rest of all free block)
+ *                 (4.1.4)  return p
+ *                 (4.2) If we can not find a free block (block size >=n), then return NULL
+```
+
+其实这些函数都在实验指导书中给出了具体的实现原理了
+
+```
+static struct Page *
+default_alloc_pages(size_t n) {
+    assert(n > 0);
+    if (n > nr_free) {		//大于可用空闲块
+        return NULL;
+    }
+    struct Page *page = NULL;
+    list_entry_t *le = &free_list;
+    while ((le = list_next(le)) != &free_list) {		//还未找到链表尾
+        struct Page *p = le2page(le, page_link);		//获取当前指针
+        if (p->property >= n) {
+            page = p;
+            break;
+        }
+    }
+    if (page != NULL) {
+        list_del(&(page->page_link));
+        if (page->property > n) {
+            struct Page *p = page + n;
+            p->property = page->property - n;			//减去用掉的链表数
+            list_add(&free_list, &(p->page_link));
+    }
+        nr_free -= n;
+        ClearPageProperty(page);
+    }
+    return page;
+}
+```
+
+### default_free_pages
+
+```
+* (5) default_free_pages: relink the pages into  free list, maybe merge small free blocks into big free blocks.
+ *               (5.1) according the base addr of withdrawed blocks, search free list, find the correct position
+ *                     (from low to high addr), and insert the pages. (may use list_next, le2page, list_add_before)
+ *               (5.2) reset the fields of pages, such as p->ref, p->flags (PageProperty)
+ *               (5.3) try to merge low addr or high addr blocks. Notice: should change some pages's p->property correctly.
+ */
+```
+
+就如实验指导书中所说：default_free_pages函数的实现其实是default_alloc_pages的逆过程，不过需要考虑空闲块的合并问题。
+
+```
+static void
+default_free_pages(struct Page *base, size_t n) {
+    assert(n > 0);
+    struct Page *p = base;
+    for (; p != base + n; p ++) {
+        assert(!PageReserved(p) && !PageProperty(p));		//页面还未被使用&&页引用为0
+        p->flags = 0;
+        set_page_ref(p, 0);
+    }
+    base->property = n;				//将第一个空闲页面的属性设置为要释放的页面数量
+    SetPageProperty(base);
+    list_entry_t *le = list_next(&free_list);			
+    while (le != &free_list) {			//遍历页表
+        p = le2page(le, page_link);
+        le = list_next(le);
+        if (base + base->property == p) {
+            base->property += p->property;
+            ClearPageProperty(p);
+            list_del(&(p->page_link));
+        }
+        else if (p + p->property == base) {		//合并页表的过程
+            p->property += base->property;
+            ClearPageProperty(base);
+            base = p;
+            list_del(&(p->page_link));
+        }
+    }
+    nr_free += n;
+    list_add(&free_list, &(base->page_link));
+}
+```
+
+该函数会将第一个空闲页面的属性设置为要释放的页面数量，并将其标记为可用空闲页面。然后，它遍历所有的空闲页面，将与要释放页面相邻的页面合并成一个大页面，并从空闲页面列表中删除旧的页面。
+
+> 引用计数是用于跟踪页面是否被占用的技术，当页面被占用时，引用计数会增加。而空闲页数量是指当前系统中可用的未被占用的物理页面的数量。
+>
+> 在引用计数的实现中，当一个进程需要访问某个页面时，它会增加该页面的引用计数，表示该页面正在被使用。当该进程完成使用后，它会将该页面的引用计数减少，如果该页面的引用计数为0，表示该页面可以被释放并添加到空闲页列表中，从而增加空闲页数量。
+
+
+
+### 可能的优化
+
+在使用 first-fit 算法分配内存后，可能会留下一些非常小的空闲块。为了避免这种情况，可以在分配内存时，如果剩余空闲块的大小小于一个阈值，可以将该块合并到前一个或后一个空闲块中，从而减少碎片化。
+
+## 练习2：实现寻找虚拟地址对应的页表项
+
+通过设置页表和对应的页表项，可建立虚拟内存地址和物理内存地址的对应关系。其中的get_pte函数是设置页表项环节中的一个重要步骤。此函数找到一个虚地址对应的二级页表项的内核虚地址，如果此二级页表项不存在，则分配一个包含此项的二级页表。本练习需要补全get_pte函数 in kern/mm/pmm.c，实现其功能。请仔细查看和理解get_pte函数中的注释。get_pte函数的调用关系图如下所示：
+
+![img](https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image001.png)
+
+请在实验报告中简要说明你的设计实现过程。请回答如下问题：
+
+- 请描述页目录项（Pag Director Entry）和页表（Page Table Entry）中每个组成部分的含义和以及对ucore而言的潜在用处。
+- 如果ucore执行过程中访问内存，出现了页访问异常，请问硬件要做哪些事情？
+
+### 解答
+
+```
+     * Some Useful MACROs and DEFINEs, you can use them in below implementation.
+     * MACROs or Functions:
+     *   PDX(la) = the index of page directory entry of VIRTUAL ADDRESS la.
+     *   KADDR(pa) : takes a physical address and returns the corresponding kernel virtual address.
+     *   set_page_ref(page,1) : means the page be referenced by one time
+     *   page2pa(page): get the physical address of memory which this (struct Page *) page  manages
+     *   struct Page * alloc_page() : allocation a page
+     *   memset(void *s, char c, size_t n) : sets the first n bytes of the memory area pointed by s
+     *                                       to the specified value c.
+     * DEFINEs:
+     *   PTE_P           0x001                   // page table/directory entry flags bit : Present
+     *   PTE_W           0x002                   // page table/directory entry flags bit : Writeable
+     *   PTE_U           0x004                   // page table/directory entry flags bit : User can access
+     */
+```
 
