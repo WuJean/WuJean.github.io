@@ -1,10 +1,14 @@
 - class_name: 友情链接
-  class_desc: 那些人，那些事
+  class_desc: HNUer
   link_list:
-    - name: Hexo
-      link: https://hexo.io/zh-tw/
-      avatar: https://d33wubrfki0l68.cloudfront.net/6657ba50e702d84afb32fe846bed54fba1a77add/827ae/logo.svg
-      descr: 快速、简单且强大的网志框架
+    - name: SkyWT
+      link: https://skywt.cn/
+      avatar: https://blog.skywt.cn/usr/themes/Daydream/assets/img/avatar.png
+      descr: 我的征途是星辰大海
+    - name: 随便寻个地方
+      link: https://zxh3032.github.io/
+      avatar: https://zxh3032.github.io/img/touxiang.png
+      descr: 偷偷挂上我舍友的友链
 
 - class_name: 网站
   class_desc: 值得推荐的网站
@@ -21,3 +25,7 @@
       link: https://twitter.com/
       avatar: https://i.loli.net/2020/05/14/5VyHPQqR6LWF39a.png
       descr: 社交分享平台
+    - name: Hexo
+      link: https://hexo.io/zh-tw/
+      avatar: https://d33wubrfki0l68.cloudfront.net/6657ba50e702d84afb32fe846bed54fba1a77add/827ae/logo.svg
+      descr: 快速、简单且强大的网志框架
