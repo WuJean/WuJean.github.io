@@ -792,14 +792,25 @@ default_alloc_pages(size_t n) {
         if (page->property > n) {
             struct Page *p = page + n;
             p->property = page->property - n;			//减去用掉的链表数
-            list_add(&free_list, &(p->page_link));
+            SetPageProperty(p);
+            ## list_add(&free_list, &(p->page_link));	//错误！
+           +list_add_before(&free_list, &(p->page_link));
     }
+    	 +list_del(&(page->page_link));		//删除tmp指针
         nr_free -= n;
         ClearPageProperty(page);
     }
     return page;
 }
 ```
+
+为什么用before呢？我们知道题目要求我们的页表项的地址要从小到大排列，由双向链表的性质可以得出以下的图：
+
+![IMG_4C134E314195-1](https://raw.githubusercontent.com/WuJean/Picgo-blog/main/IMG_4C134E314195-1.jpeg)
+
+整个函数的过程用图可以表示为：
+
+![IMG_A98781407AB6-1](https://raw.githubusercontent.com/WuJean/Picgo-blog/main/IMG_A98781407AB6-1.jpeg)
 
 ### default_free_pages
 
@@ -843,7 +854,16 @@ default_free_pages(struct Page *base, size_t n) {
         }
     }
     nr_free += n;
-    list_add(&free_list, &(base->page_link));
+    list_add(&free_list, &(base->page_link));			//错误！
+    le = &free_list;
+		while ((le = list_next(le)) != &free_list){
+    	p = le2page(le, page_link);
+    	if (base + base->property <= p) {
+        	assert(base + base->property != p);
+        	break;
+    		}
+			}
+		list_add_before(le, &(base->page_link));
 }
 ```
 
@@ -889,3 +909,140 @@ default_free_pages(struct Page *base, size_t n) {
      */
 ```
 
+```
+		pde_t *pdep = &pgdir[PDX(la)];
+
+    // 如果该项不可用
+    if (!(*pdep & PTE_P))
+    {
+        struct Page *page;
+
+        // 如果分配页面失败或者不允许分配，则返回NULL
+        if (!create || (page = alloc_page()) == NULL)
+            return NULL;
+
+        // 否则进行分配
+        // 设置该物理页面的引用次数为1
+        set_page_ref(page, 1);
+
+        // 获取当前物理页面所管理的物理地址
+        uintptr_t pa = page2pa(page);
+
+        // 清空该物理页面的数据（需要注意使用的是虚拟地址）
+        // KADDR(pa) : 获取物理地址pa对应的内核虚拟地址
+        memset(KADDR(pa), 0, PGSIZE);
+
+        // 将新分配的页表设置权限后填入页目录项中
+        *pdep = pa | PTE_U | PTE_W | PTE_P;
+    }
+     		return &((pte_t *)KADDR(PDE_ADDR(*pdep)))[PTX(la)];
+```
+
+### 解答2
+
+如果 ucore 执行过程中访问内存，出现了页访问异常，请问硬件要做哪些事情？
+
+**答：**
+
+- 将触发`页访问异常`的**虚地址**保存到`cr2`寄存器中
+- 设置**错误代码**，触发 14 号中断，也就是`缺页错误`
+- 抛出`Page Fault`异常，将外存的数据读到内存中（应该是读存在硬盘上的虚拟内存分页文件）
+- 进行`上下文切换`，退出中断，返回到中断前的状态
+
+## 练习3
+
+当释放一个包含某虚地址的物理内存页时，需要让对应此物理内存页的管理数据结构 Page 做相关的清除处理，使得此物理内存页成为空闲；另外还需把表示虚地址与物理地址对应关系的二级页表项清除。补全 page_remove_pte 函数。
+
+## 解答
+
+```
+static inline void
+page_remove_pte(pde_t *pgdir, uintptr_t la, pte_t *ptep)
+{
+    /* LAB2 EXERCISE 3: YOUR CODE
+    *
+    * Please check if ptep is valid, and tlb must be manually updated if mapping is updated
+    *
+    * Maybe you want help comment, BELOW comments can help you finish the code
+    *
+    * Some Useful MACROs and DEFINEs, you can use them in below implementation.
+    * MACROs or Functions:
+    *   struct Page *page pte2page(*ptep): get the according page from the value of a ptep
+    *   free_page : free a page
+    *   page_ref_dec(page) : decrease page->ref. NOTICE: ff page->ref == 0 , then this page should be free.
+    *   tlb_invalidate(pde_t *pgdir, uintptr_t la) : Invalidate a TLB entry, but only if the page tables being
+    *                        edited are the ones currently in use by the processor.
+    * DEFINEs:
+    *   PTE_P           0x001                   // page table/directory entry flags bit : Present
+    */
+
+    // 如果传入的页表项是可用的
+    if (*ptep & PTE_P)
+    {
+        // 获取该页表项所对应的地址
+        struct Page *page = pte2page(*ptep);
+
+        // 如果该页的引用次数在减1后为0，表明仅被我们当前引用了1次，可以释放
+        if (page_ref_dec(page) == 0)
+            // 释放当前页
+            free_page(page);
+
+        // 二级页表表项清零
+        *ptep = 0;
+
+        // 刷新TLB中该页的缓存使其无效（当且仅当正在编辑的页表是处理器当前正在使用的页表时）
+        tlb_invalidate(pgdir, la);
+    }
+}
+```
+
+>         TLB(Translation Lookaside Buffer)转换检测缓冲区是一个内存管理单元,是用于改进虚拟地址到物理地址转换速度的缓存。
+>         其中每一行都保存着一个由单个PTE(Page Table Entry,页表项)组成的块。
+>         如果没有TLB，则每次取数据都需要两次访问内存。
+
+![](https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230423150431884.png)
+
+### 解答2
+
+数据结构 Page 的全局变量（其实是一个数组）的每一项与页表中的页目录项和页表项有无对应关系？如果有，其对应关系是什么？
+
+当页目录项或页表项有效时，`Page`数组中的项与页目录项或页表项**存在对应关系**。实际上，**每个页目录项记录一个页表的信息，每个页表项记录一个物理页的信息。**页目录表中存放着数个页表项，这些页表项中存放了某个二级页表所在物理页的信息，包括该二级页表的**物理地址**，但使用**线性地址**的头部`PDX(Page Directory Index)`来索引页目录表。而页表（二级页表）与页目录（一级页表）具有类似的特性，页表中的页表项指向所管理的物理页的**物理地址**，使用**线性地址**的中部`PTX(Page Table Index)`来索引页表。页目录项保存的物理页面地址（即某个页表），以及页表项保存的物理页面地址都对应于`Page`数组中的某一页。
+
+### 解答3
+
+如果希望虚拟地址与物理地址相等，则需要如何修改 lab2 才能完成此事？
+
+- 先将`tools/kernel.ld`中的`第10行`的`内核加载地址`从`0xC0100000`修改为`0x00100000`
+
+```none
+// 代码第10行 修改前：
+. = 0xC0100000;
+
+// 代码第10行 修改后:
+. = 0x00100000;
+```
+
+- 再将`kern/mm/memlayout.h`中的`第56行`的`内核偏移地址`从`0xC0000000`修改为`0x00000000`
+
+```c
+// 代码第56行 修改前:
+#define KERNBASE            0xC0000000
+
+// 代码第56行 修改后:
+#define KERNBASE            0x00000000
+```
+
+- **关闭页机制**，这一步是为了保证运行时不报错。将`kern/init/entry.S`中`开启页机制`的那一段代码删除即可。否则在分页模式，取消掉 `boot_pgdir[0]` 的页表下 `kern_init` 会被置于一个根本无法访问到的地址。
+
+```asm
+# 代码第14-17行 修改前：
+movl %cr0, %eax
+orl $(CR0_PE | CR0_PG | CR0_AM | CR0_WP | CR0_NE | CR0_TS | CR0_EM | CR0_MP), %eax
+andl $~(CR0_TS | CR0_EM), %eax
+movl %eax, %cr0
+
+# 代码第14-17行 修改后：
+# 直接删除第14-17行代码
+```
+
+​	
