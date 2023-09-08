@@ -9,6 +9,14 @@
       link: https://zxh3032.github.io/
       avatar: https://zxh3032.github.io/img/touxiang.png
       descr: 偷偷挂上我舍友的友链
+    - name: WuJean
+      link: https://wujean.github.io/
+      avatar: https://wujean.github.io/img/avatar.png
+      descr: 苟利国家生死以，岂因祸福避趋之
+    - name: WolfMei
+      link: https://wolfvoid.github.io/
+      avatar: https://github.com/wolfvoid/wolfvoid.github.io/blob/master/medias/avatar.jpg
+      descr: 甘而心雨，刻而天晴
 
 - class_name: 网站
   class_desc: 值得推荐的网站
