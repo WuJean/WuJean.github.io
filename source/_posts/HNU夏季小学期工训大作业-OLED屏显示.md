@@ -1,5 +1,5 @@
 ---
-title: HNU夏季小学期工训大作业-OLED屏显示
+title: HNU-夏季小学期工训大作业-OLED屏显示
 date: 2023-09-07 14:56:11
 updated:
 tags:
@@ -8,7 +8,7 @@ keywords:
 description:
 top_img:
 comments:
-cover:
+cover: https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230908164552847.png
 ---
 
 大二夏小学期第二阶段要求基于STC板完成一个课程设计，本质上就是抄来抄去换名字水过去，助教的验收更是水之又水，通过验收时到达的顺序来划分分数段。反正水过去就完了，抄来抄去也是没意思，想起以前买过一个oled小屏幕，于是决定基于这个屏幕来完成我的大作业。写这篇文章记录一下完成这个项目的过程，希望可以让有缘人在使用屏幕的时候少走一些弯路。
