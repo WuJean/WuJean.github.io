@@ -1,0 +1,578 @@
+<!DOCTYPE html><html lang="zh-Hans" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>HNU-操作系统-笔记and作业 | 岳麓山下你和我</title><meta name="author" content="WuJean"><meta name="copyright" content="WuJean"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="本笔记开始于操作系统期中考前一周，为了应付莫名奇妙开始的作业，以及整理上课的零碎笔记；这本书的内容安排稀碎，但是课后习题都有配套的代码，以及详细有新意的Readme文档，可以说作业才是这本书的主题内容，希望同学们课可以不认真听，但是课后作业一定要好好学习！ 开始先放上两个github的仓库链接，无论你是想要认真学习还是摸鱼通过，这两个仓库都能让你更加轻松快乐的学习 https:&#x2F;&#x2F;github.c">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HNU-操作系统-笔记and作业">
+<meta property="og:url" content="http://wujean.github.io/2023/04/03/HNU-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-%E7%AC%94%E8%AE%B0and%E4%BD%9C%E4%B8%9A/index.html">
+<meta property="og:site_name" content="岳麓山下你和我">
+<meta property="og:description" content="本笔记开始于操作系统期中考前一周，为了应付莫名奇妙开始的作业，以及整理上课的零碎笔记；这本书的内容安排稀碎，但是课后习题都有配套的代码，以及详细有新意的Readme文档，可以说作业才是这本书的主题内容，希望同学们课可以不认真听，但是课后作业一定要好好学习！ 开始先放上两个github的仓库链接，无论你是想要认真学习还是摸鱼通过，这两个仓库都能让你更加轻松快乐的学习 https:&#x2F;&#x2F;github.c">
+<meta property="og:locale">
+<meta property="og:image" content="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230403215050394.png">
+<meta property="article:published_time" content="2023-04-03T13:49:36.000Z">
+<meta property="article:modified_time" content="2023-09-05T01:21:03.712Z">
+<meta property="article:author" content="WuJean">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230403215050394.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://wujean.github.io/2023/04/03/HNU-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-%E7%AC%94%E8%AE%B0and%E4%BD%9C%E4%B8%9A/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  }
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'HNU-操作系统-笔记and作业',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-09-05 09:21:03'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">22</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">7</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">0</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/ToDo/"><span> 待办事项</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230403215050394.png')"><nav id="nav"><span id="blog-info"><a href="/" title="岳麓山下你和我"><span class="site-name">岳麓山下你和我</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/ToDo/"><span> 待办事项</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">HNU-操作系统-笔记and作业</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-04-03T13:49:36.000Z" title="Created 2023-04-03 21:49:36">2023-04-03</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-09-05T01:21:03.712Z" title="Updated 2023-09-05 09:21:03">2023-09-05</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">Word count:</span><span class="word-count">8.4k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">Reading time:</span><span>31min</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="HNU-操作系统-笔记and作业"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>本笔记开始于操作系统期中考前一周，为了应付莫名奇妙开始的作业，以及整理上课的零碎笔记；这本书的内容安排稀碎，但是课后习题都有配套的代码，以及详细有新意的Readme文档，可以说作业才是这本书的主题内容，希望同学们课可以不认真听，但是课后作业一定要好好学习！</p>
+<h1 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h1><p>先放上两个github的仓库链接，无论你是想要认真学习还是摸鱼通过，这两个仓库都能让你更加轻松快乐的学习</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/WuJean/ostep-homework.git">https://github.com/WuJean/ostep-homework.git</a> 官方的作业合集</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/WuJean/Operating-Systems-Three-Easy-Pieces-NOTES.git">https://github.com/WuJean/Operating-Systems-Three-Easy-Pieces-NOTES.git</a> 中文答案</p>
+<p>我们现在需要将官方的示例代码clone到本地，笔者使用的是本地esxi中的ubuntu22.04环境</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/WuJean/ostep-homework.git</span><br></pre></td></tr></table></figure>
+
+<p>在每章中我将采用提问的方式一步步梳理知识点</p>
+<h1 id="第4章-抽象：进程"><a href="#第4章-抽象：进程" class="headerlink" title="第4章 抽象：进程"></a>第4章 抽象：进程</h1><p>操作系统提供了基本的抽象——进程；进程就是运行中的程序；</p>
+<blockquote>
+<p>如何提供多cpu的假象来同时运行多个进程？</p>
+</blockquote>
+<p>操作系统通过虚拟化cpu来提供这种假象；</p>
+<p>这就是<strong>时分共享</strong>技术</p>
+<p>cpu的虚拟化的协调需要：</p>
+<ul>
+<li>低级机制</li>
+<li>高级智能</li>
+</ul>
+<p>这些策略将在后面一一介绍</p>
+<h2 id="4-1-抽象：进程"><a href="#4-1-抽象：进程" class="headerlink" title="4.1 抽象：进程"></a>4.1 抽象：进程</h2><p>操作系统为正在运行的程序提供的抽象，就是所谓的进程（process）。</p>
+<ul>
+<li><p>机器状态的组成部分：</p>
+<ul>
+<li><p>内存</p>
+</li>
+<li><p>寄存器</p>
+</li>
+<li><p>持久存储设备</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="4-2-进程API"><a href="#4-2-进程API" class="headerlink" title="4.2 进程API"></a>4.2 进程API</h2><ul>
+<li>创建</li>
+<li>销毁</li>
+<li>等待</li>
+<li>其他控制</li>
+<li>状态</li>
+</ul>
+<h2 id="4-3-进程创建：更多细节"><a href="#4-3-进程创建：更多细节" class="headerlink" title="4.3 进程创建：更多细节"></a>4.3 进程创建：更多细节</h2><p>程序如何转化为内存：操作系统如何启动并运行一个程序</p>
+<ul>
+<li>加载程序到内存中</li>
+<li>分配堆栈</li>
+<li>其他初始化</li>
+<li>跳转到程序入口</li>
+<li>OS移交控制权</li>
+</ul>
+<h2 id="4-4-进程状态"><a href="#4-4-进程状态" class="headerlink" title="4.4 进程状态"></a>4.4 进程状态</h2><ul>
+<li>运行</li>
+<li>就绪</li>
+<li>阻塞</li>
+</ul>
+<h2 id="4-5-数据结构"><a href="#4-5-数据结构" class="headerlink" title="4.5 数据结构"></a>4.5 数据结构</h2><p>操作系统为了跟踪每个进程的状态使用了进程列表。</p>
+<p>对于停止的进程，寄存器上下文将保存其寄存器的内容。当一个进程停止时，它的寄存器将被保存到这个内存位置。<br>通过恢复这些寄存器（将它们的值放回实际的物理寄存器中），操作系统可以恢复运行该进程。我们将在后面的章节中更多地了解这种技术，它被称为上下文切换（context switch）。</p>
+<p>书中给出了XV6内核中的进程内容，其中proc结构体中有很多进程的信息。</p>
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>这个程序叫 process-run.py, 允许您查看进程状态在 CPU 上运行时的变化情况. 如本章所述，进程可以处于几种不同的状态：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">运行(RUNNING) - 进程正在使用CPU</span><br><span class="line">就绪(READY)   - 进程现在可以使用CPU，但是其他进程正在使用</span><br><span class="line">等待(WAITING) - 进程正在等待I / O完成(例如，它向磁盘发出请求)</span><br><span class="line">完成(DONE)    - 过程执行完毕</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">Usage: process-run.py [options]</span><br><span class="line"></span><br><span class="line">Options:</span><br><span class="line">  -h, --help            查看帮助信息</span><br><span class="line">  -s SEED, --seed=SEED  随机种子</span><br><span class="line">  -l PROCESS_LIST, --processlist=PROCESS_LIST</span><br><span class="line">                        以逗号分隔的要运行的进程列表，格式为X1：Y1，X2：Y2，...，其中X是该进程应运行的指令数，Y是该指令将运行的概率（从0到100）,指令包括使用CPU或进行IO</span><br><span class="line"></span><br><span class="line">  -L IO_LENGTH, --iolength=IO_LENGTH</span><br><span class="line">                        IO花费时间</span><br><span class="line">  -S PROCESS_SWITCH_BEHAVIOR, --switch=PROCESS_SWITCH_BEHAVIOR</span><br><span class="line">                        当进程发出IO时,系统的反应: </span><br><span class="line">                        - SWITCH_ON_IO</span><br><span class="line">                        - SWITCH_ON_END </span><br><span class="line">  -I IO_DONE_BEHAVIOR, --iodone=IO_DONE_BEHAVIOR</span><br><span class="line">                        IO结束时的行为类型: IO_RUN_LATER/IO_RUN_IMMEDIATE</span><br><span class="line">                        - IO_RUN_IMMEDIATE: 立即切换到这个进程</span><br><span class="line">                        - IO_RUN_LATER: 自然切换到这个进程(例如:取决于进程切换行为)</span><br><span class="line">  -c                    计算结果</span><br><span class="line">  -p, --printstats      打印统计数据； 仅与-c参数一起使用是有效</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><code>./process-run.py -l 5:100,5:100</code>​</li>
+</ol>
+<p>该条命令运行两个进程，我们指定的参数为”5：100”，这意味着程序应该由 5 条指令组成，并且每条指令为 CPU 指令的机会为 100％。</p>
+<p>CPU的利用率应为百分之百</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">$ python3 process-run.py -l 5:100,5:100 -c -p</span><br><span class="line">Time        PID: 0        PID: 1           CPU           IOs</span><br><span class="line">  1        RUN:cpu         READY             1</span><br><span class="line">  2        RUN:cpu         READY             1</span><br><span class="line">  3        RUN:cpu         READY             1</span><br><span class="line">  4        RUN:cpu         READY             1</span><br><span class="line">  5        RUN:cpu         READY             1</span><br><span class="line">  6           DONE       RUN:cpu             1</span><br><span class="line">  7           DONE       RUN:cpu             1</span><br><span class="line">  8           DONE       RUN:cpu             1</span><br><span class="line">  9           DONE       RUN:cpu             1</span><br><span class="line"> 10           DONE       RUN:cpu             1</span><br><span class="line"></span><br><span class="line">Stats: Total Time 10</span><br><span class="line">Stats: CPU Busy 10 (100.00%)</span><br><span class="line">Stats: IO Busy  0 (0.00%)</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><code>python3 process-run.py -l 4:100,1:0</code>​</li>
+</ol>
+<p>先执行cpu指令，再执行io指令，最后cpu发出io_down指令，共需要11个时钟周期。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">$ python3 process-run.py -l 4:100,1:0 -c -p</span><br><span class="line">Time        PID: 0        PID: 1           CPU           IOs</span><br><span class="line">  1        RUN:cpu         READY             1</span><br><span class="line">  2        RUN:cpu         READY             1</span><br><span class="line">  3        RUN:cpu         READY             1</span><br><span class="line">  4        RUN:cpu         READY             1</span><br><span class="line">  5           DONE        RUN:io             1</span><br><span class="line">  6           DONE       BLOCKED                           1</span><br><span class="line">  7           DONE       BLOCKED                           1</span><br><span class="line">  8           DONE       BLOCKED                           1</span><br><span class="line">  9           DONE       BLOCKED                           1</span><br><span class="line"> 10           DONE       BLOCKED                           1</span><br><span class="line"> 11*          DONE   RUN:io_done             1</span><br><span class="line"></span><br><span class="line">Stats: Total Time 11</span><br><span class="line">Stats: CPU Busy 6 (54.55%)</span><br><span class="line">Stats: IO Busy  5 (45.45%)</span><br></pre></td></tr></table></figure>
+
+<p>可以注意到cpu的利用率很低。</p>
+<ol start="3">
+<li><code>python3 process-run.py -l 1:0，4:100</code>​</li>
+</ol>
+<p>先发出io请求，cpu执行指令，io和cpu同时运行。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ python3 process-run.py -l 1:0,4:100 -c -p</span><br><span class="line">Time        PID: 0        PID: 1           CPU           IOs</span><br><span class="line">  1         RUN:io         READY             1</span><br><span class="line">  2        BLOCKED       RUN:cpu             1             1</span><br><span class="line">  3        BLOCKED       RUN:cpu             1             1</span><br><span class="line">  4        BLOCKED       RUN:cpu             1             1</span><br><span class="line">  5        BLOCKED       RUN:cpu             1             1</span><br><span class="line">  6        BLOCKED          DONE                           1</span><br><span class="line">  7*   RUN:io_done          DONE             1</span><br><span class="line"></span><br><span class="line">Stats: Total Time 7</span><br><span class="line">Stats: CPU Busy 6 (85.71%)</span><br><span class="line">Stats: IO Busy  5 (71.43%)</span><br></pre></td></tr></table></figure>
+
+<p>可以看到由于io和cpu可以同时执行，io发起的时机对cpu的利用率有很大的影响。</p>
+<ol start="4">
+<li><code>python3 process-run.py -l 1:0,4:100 -c -S SWITCH_ON_END -p</code></li>
+</ol>
+<p>将标志设置为 <code>SWITCH_ON_END</code>​，在进程进行 I&#x2F;O 操作时，系统将不会切换到另一个进程，而是等待进程完成。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">$ python3 process-run.py -l 1:0,4:100 -c -S SWITCH_ON_END -p</span><br><span class="line">Time        PID: 0        PID: 1           CPU           IOs</span><br><span class="line">  1         RUN:io         READY             1</span><br><span class="line">  2        BLOCKED         READY                           1</span><br><span class="line">  3        BLOCKED         READY                           1</span><br><span class="line">  4        BLOCKED         READY                           1</span><br><span class="line">  5        BLOCKED         READY                           1</span><br><span class="line">  6        BLOCKED         READY                           1</span><br><span class="line">  7*   RUN:io_done         READY             1</span><br><span class="line">  8           DONE       RUN:cpu             1</span><br><span class="line">  9           DONE       RUN:cpu             1</span><br><span class="line"> 10           DONE       RUN:cpu             1</span><br><span class="line"> 11           DONE       RUN:cpu             1</span><br><span class="line"></span><br><span class="line">Stats: Total Time 11</span><br><span class="line">Stats: CPU Busy 6 (54.55%)</span><br><span class="line">Stats: IO Busy  5 (45.45%)</span><br></pre></td></tr></table></figure>
+
+<p>这样会导致cpu的利用率下降。</p>
+<ol start="5">
+<li><code>python3 process-run.py -l 1:0,4:100 -c -S SWITCH_ON_IO</code>​</li>
+</ol>
+<p><code>SWITCH_ON_IO</code>​在等待 I&#x2F;O 时切换到另一个进程。这种策略可以在io时候很好的利用cpu。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ python3 process-run.py -l 1:0,4:100 -c -S SWITCH_ON_IO -p</span><br><span class="line">Time        PID: 0        PID: 1           CPU           IOs</span><br><span class="line">  1         RUN:io         READY             1</span><br><span class="line">  2        BLOCKED       RUN:cpu             1             1</span><br><span class="line">  3        BLOCKED       RUN:cpu             1             1</span><br><span class="line">  4        BLOCKED       RUN:cpu             1             1</span><br><span class="line">  5        BLOCKED       RUN:cpu             1             1</span><br><span class="line">  6        BLOCKED          DONE                           1</span><br><span class="line">  7*   RUN:io_done          DONE             1</span><br><span class="line"></span><br><span class="line">Stats: Total Time 7</span><br><span class="line">Stats: CPU Busy 6 (85.71%)</span><br><span class="line">Stats: IO Busy  5 (71.43%)</span><br></pre></td></tr></table></figure>
+
+<p>可以看到cpu的利用率提高了。</p>
+<ol start="6">
+<li><code>python3 process-run.py -l 3:0,5:100,5:100,5:100 -S SWITCH_ON_IO -I IO_RUN_LATER -c -p</code>​</li>
+</ol>
+<p>利用<code>-I IO_RUN_LATER</code>​，当 I&#x2F;O 完成时，发出它的进程不一定马上运行。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">$ python3 process-run.py -l 3:0,5:100,5:100,5:100 -S SWITCH_ON_IO -I IO_RUN_LATER -c -p</span><br><span class="line">Time        PID: 0        PID: 1        PID: 2        PID: 3           CPU           IOs</span><br><span class="line">  1         RUN:io         READY         READY         READY             1</span><br><span class="line">  2        BLOCKED       RUN:cpu         READY         READY             1             1</span><br><span class="line">  3        BLOCKED       RUN:cpu         READY         READY             1             1</span><br><span class="line">  4        BLOCKED       RUN:cpu         READY         READY             1             1</span><br><span class="line">  5        BLOCKED       RUN:cpu         READY         READY             1             1</span><br><span class="line">  6        BLOCKED       RUN:cpu         READY         READY             1             1</span><br><span class="line">  7*         READY          DONE       RUN:cpu         READY             1</span><br><span class="line">  8          READY          DONE       RUN:cpu         READY             1</span><br><span class="line">  9          READY          DONE       RUN:cpu         READY             1</span><br><span class="line"> 10          READY          DONE       RUN:cpu         READY             1</span><br><span class="line"> 11          READY          DONE       RUN:cpu         READY             1</span><br><span class="line"> 12          READY          DONE          DONE       RUN:cpu             1</span><br><span class="line"> 13          READY          DONE          DONE       RUN:cpu             1</span><br><span class="line"> 14          READY          DONE          DONE       RUN:cpu             1</span><br><span class="line"> 15          READY          DONE          DONE       RUN:cpu             1</span><br><span class="line"> 16          READY          DONE          DONE       RUN:cpu             1</span><br><span class="line"> 17    RUN:io_done          DONE          DONE          DONE             1</span><br><span class="line"> 18         RUN:io          DONE          DONE          DONE             1</span><br><span class="line"> 19        BLOCKED          DONE          DONE          DONE                           1</span><br><span class="line"> 20        BLOCKED          DONE          DONE          DONE                           1</span><br><span class="line"> 21        BLOCKED          DONE          DONE          DONE                           1</span><br><span class="line"> 22        BLOCKED          DONE          DONE          DONE                           1</span><br><span class="line"> 23        BLOCKED          DONE          DONE          DONE                           1</span><br><span class="line"> 24*   RUN:io_done          DONE          DONE          DONE             1</span><br><span class="line"> 25         RUN:io          DONE          DONE          DONE             1</span><br><span class="line"> 26        BLOCKED          DONE          DONE          DONE                           1</span><br><span class="line"> 27        BLOCKED          DONE          DONE          DONE                           1</span><br><span class="line"> 28        BLOCKED          DONE          DONE          DONE                           1</span><br><span class="line"> 29        BLOCKED          DONE          DONE          DONE                           1</span><br><span class="line"> 30        BLOCKED          DONE          DONE          DONE                           1</span><br><span class="line"> 31*   RUN:io_done          DONE          DONE          DONE             1</span><br><span class="line"></span><br><span class="line">Stats: Total Time 31</span><br><span class="line">Stats: CPU Busy 21 (67.74%)</span><br><span class="line">Stats: IO Busy  15 (48.39%)</span><br></pre></td></tr></table></figure>
+
+<p>我们发现在第7个时钟周期时，进程1发出的io已经结束，进程进入ready状态；但是由于<code>-I IO_RUN_LATER</code>​的设置，系统选择先运行进程3，导致io阻塞了一段很长的时间。同时，由于进程在等待自己的io完成，浪费了很多的cpu时间。</p>
+<p>系统的资源没有被合理利用。</p>
+<ol start="7">
+<li><code>python3 process-run.py -l 3:0,5:100,5:100,5:100 -S SWITCH_ON_IO -I IO_RUN_IMMEDIATE -c -p</code>​</li>
+</ol>
+<p><code>-I IO_RUN_IMMEDIATE</code>​ 设置，该设置立即运行发出I&#x2F;O 的进程。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">$ python3 process-run.py -l 3:0,5:100,5:100,5:100 -S SWITCH_ON_IO -I IO_RUN_IMMEDIATE -c -p</span><br><span class="line">Time        PID: 0        PID: 1        PID: 2        PID: 3           CPU           IOs</span><br><span class="line">  1         RUN:io         READY         READY         READY             1</span><br><span class="line">  2        BLOCKED       RUN:cpu         READY         READY             1             1</span><br><span class="line">  3        BLOCKED       RUN:cpu         READY         READY             1             1</span><br><span class="line">  4        BLOCKED       RUN:cpu         READY         READY             1             1</span><br><span class="line">  5        BLOCKED       RUN:cpu         READY         READY             1             1</span><br><span class="line">  6        BLOCKED       RUN:cpu         READY         READY             1             1</span><br><span class="line">  7*   RUN:io_done          DONE         READY         READY             1</span><br><span class="line">  8         RUN:io          DONE         READY         READY             1</span><br><span class="line">  9        BLOCKED          DONE       RUN:cpu         READY             1             1</span><br><span class="line"> 10        BLOCKED          DONE       RUN:cpu         READY             1             1</span><br><span class="line"> 11        BLOCKED          DONE       RUN:cpu         READY             1             1</span><br><span class="line"> 12        BLOCKED          DONE       RUN:cpu         READY             1             1</span><br><span class="line"> 13        BLOCKED          DONE       RUN:cpu         READY             1             1</span><br><span class="line"> 14*   RUN:io_done          DONE          DONE         READY             1</span><br><span class="line"> 15         RUN:io          DONE          DONE         READY             1</span><br><span class="line"> 16        BLOCKED          DONE          DONE       RUN:cpu             1             1</span><br><span class="line"> 17        BLOCKED          DONE          DONE       RUN:cpu             1             1</span><br><span class="line"> 18        BLOCKED          DONE          DONE       RUN:cpu             1             1</span><br><span class="line"> 19        BLOCKED          DONE          DONE       RUN:cpu             1             1</span><br><span class="line"> 20        BLOCKED          DONE          DONE       RUN:cpu             1             1</span><br><span class="line"> 21*   RUN:io_done          DONE          DONE          DONE             1</span><br><span class="line"></span><br><span class="line">Stats: Total Time 21</span><br><span class="line">Stats: CPU Busy 21 (100.00%)</span><br><span class="line">Stats: IO Busy  15 (71.43%)</span><br></pre></td></tr></table></figure>
+
+<p>我们可以看到cpu利用率达到了百分百，进程在等待io时切换到其他进程，io完成后马上io_done并释放io，大大提高了系统资源的利用效率。</p>
+<ol start="8">
+<li>随机生成+调参</li>
+</ol>
+<h1 id="第五章-插叙：进程API"><a href="#第五章-插叙：进程API" class="headerlink" title="第五章 插叙：进程API"></a>第五章 插叙：进程API</h1><h2 id="5-1-fork系统调用"><a href="#5-1-fork系统调用" class="headerlink" title="5.1 fork系统调用"></a>5.1 fork系统调用</h2><p><code>fork()</code> 是一个在 Unix 系统中常用的系统调用，它用于创建一个新的进程。在 <code>fork()</code> 调用之前，进程只有一个，而在 <code>fork()</code> 调用之后，进程会被分成两个进程：原始进程和新进程。这两个进程将运行相同的程序，但是它们各自有不同的进程 ID，也就是 PID。</p>
+<p><code>fork()</code> 调用的基本语法是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line"></span><br><span class="line">pid_t fork(void);</span><br></pre></td></tr></table></figure>
+
+<p><code>fork()</code> 调用返回两次，一次在父进程中，一次在子进程中。在父进程中，返回的值是新进程的 PID，而在子进程中，返回的值是 0。这样，程序可以根据返回值判断它是在父进程中还是在子进程中。</p>
+<p>在 <code>fork()</code> 调用之后，父进程和子进程将各自拥有自己的地址空间、文件描述符等资源，但是它们之间共享代码段、数据段和堆栈段等只读的资源。这种机制使得程序可以并发地执行，也为进程间通信提供了便利。</p>
+<h2 id="5-2-wait系统调用"><a href="#5-2-wait系统调用" class="headerlink" title="5.2 wait系统调用"></a>5.2 wait系统调用</h2><p><code>wait()</code> 是 Unix 系统中常用的系统调用之一，用于父进程等待子进程结束并获取子进程的状态信息。当父进程调用 <code>wait()</code> 函数时，如果它的任何一个子进程已经结束并且还没有被等待，则 <code>wait()</code> 函数会阻塞父进程，直到其中一个子进程结束并返回其退出状态信息。</p>
+<p><code>wait()</code> 调用的基本语法如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;sys/types.h&gt;</span><br><span class="line">#include &lt;sys/wait.h&gt;</span><br><span class="line"></span><br><span class="line">pid_t wait(int *status);</span><br></pre></td></tr></table></figure>
+
+<p>其中 <code>status</code> 参数是一个指向 <code>int</code> 类型的指针，用于存储子进程的退出状态信息。如果子进程正常结束，<code>status</code> 将包含子进程的退出状态码；如果子进程被信号终止，<code>status</code> 将包含一个相应的信号值。</p>
+<p><code>wait()</code> 函数返回结束的子进程的进程 ID，如果没有子进程结束，则返回 -1。如果父进程同时有多个子进程在运行，则 <code>wait()</code> 函数只会等待其中一个子进程结束，而其他子进程继续运行。</p>
+<p>除了 <code>wait()</code> 函数外，还有一些类似的系统调用，如 <code>waitpid()</code> 和 <code>wait3()</code>，它们可以更精细地控制子进程的等待和获取子进程的状态信息。</p>
+<h2 id="5-3-exec系统调用"><a href="#5-3-exec系统调用" class="headerlink" title="5.3 exec系统调用"></a>5.3 exec系统调用</h2><p><code>exec()</code> 是 Unix 系统中常用的系统调用之一，用于将当前进程替换为一个新的进程。通过调用 <code>exec()</code> 函数，可以让当前进程执行一个全新的程序文件，而无需创建一个新的进程。</p>
+<p><code>exec()</code> 系列函数的基本语法如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line"></span><br><span class="line">int execvp(const char *file, char *const argv[]);</span><br></pre></td></tr></table></figure>
+
+<p>其中，<code>file</code> 参数是要执行的程序文件的路径名，<code>argv</code> 参数是一个指向参数字符串的指针数组，它是以 NULL 结尾的。</p>
+<p><code>exec()</code> 函数会将当前进程的代码、数据和堆栈等全部替换为新程序的代码、数据和堆栈等，然后开始执行新程序。新程序接收的命令行参数是由 <code>argv</code> 参数指定的。</p>
+<p>由于 <code>exec()</code> 函数会替换当前进程的代码和数据，因此调用 <code>exec()</code> 后，原来的进程 ID、环境变量、文件描述符等信息都会被新程序取代。如果 <code>exec()</code> 函数调用成功，它将不会返回，而是直接开始执行新程序。</p>
+<p>在 Unix 系统中，常见的 <code>exec()</code> 系列函数有 <code>execlp()</code>、<code>execvp()</code>、<code>execle()</code>、<code>execv()</code> 等。这些函数的区别在于参数传递方式和搜索可执行文件的方式等。</p>
+<h2 id="5-4-为什么这样设计API"><a href="#5-4-为什么这样设计API" class="headerlink" title="5.4 为什么这样设计API"></a>5.4 为什么这样设计API</h2><p>看不懂</p>
+<h2 id="5-5-其他API"><a href="#5-5-其他API" class="headerlink" title="5.5 其他API"></a>5.5 其他API</h2><p>后面会学到</p>
+<h2 id="文档"><a href="#文档" class="headerlink" title="文档"></a>文档</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd /workspace/ostep-homework/cpu-api</span><br></pre></td></tr></table></figure>
+
+<h3 id="fork-py"><a href="#fork-py" class="headerlink" title="fork.py"></a>fork.py</h3><p>可以通过<code>fork.py</code>查看fork后的进程树</p>
+<h3 id="generator-py"><a href="#generator-py" class="headerlink" title="generator.py"></a>generator.py</h3><p>可以通过命令生成fork和wait的c语言文件并显示执行的结果，用来理解wait的含义</p>
+<h2 id="问题-1"><a href="#问题-1" class="headerlink" title="问题"></a>问题</h2><ol>
+<li>编写一个调用 fork()的程序。在调用之前,让主进程访问一个变量(例如 x)并将其值设置为某个值(例如 100)。子进程中的变量有什么值?当子进程和父进程都改变 x 的值时,变量会发生什么?</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    int x = 100;</span><br><span class="line">    pid_t pid = fork();</span><br><span class="line"></span><br><span class="line">    if (pid &lt; 0) &#123;</span><br><span class="line">        fprintf(stderr, &quot;fork failed\n&quot;);</span><br><span class="line">        exit(1);</span><br><span class="line">    &#125; else if (pid == 0) &#123;</span><br><span class="line">        printf(&quot;Child process: x = %d\n&quot;, x); // 子进程访问 x 的值</span><br><span class="line">        x = 200; // 子进程修改 x 的值</span><br><span class="line">        printf(&quot;Child process: x = %d\n&quot;, x); // 子进程再次访问 x 的值</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        printf(&quot;Parent process: x = %d\n&quot;, x); // 父进程访问 x 的值</span><br><span class="line">        x = 300; // 父进程修改 x 的值</span><br><span class="line">        printf(&quot;Parent process: x = %d\n&quot;, x); // 父进程再次访问 x 的值</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Parent process: x = 100</span><br><span class="line">Parent process: x = 300</span><br><span class="line">Child process: x = 100</span><br><span class="line">Child process: x = 200</span><br></pre></td></tr></table></figure>
+
+<p>当主进程访问变量 <code>x</code>​ 时，其值设置为 <code>100</code>​。当 <code>fork()</code>​ 调用创建子进程时，子进程将获得父进程的副本，因此 <code>x</code>​ 的值将是 <code>100</code>​。在子进程和父进程中都修改 <code>x</code>​ 的值时，每个进程都将修改其副本的值，因此父进程和子进程的 <code>x</code>​ 变量值是不同的。例如，子进程将 <code>x</code>​ 设置为 <code>200</code>​，而父进程将 <code>x</code>​ 设置为 <code>300</code>​，因此子进程中的 <code>x</code>​ 的值为 <code>200</code>​，而父进程中的 <code>x</code>​ 的值为 <code>300</code>​。</p>
+<ol start="2">
+<li>编写一个打开文件的程序(使用 open 系统调用),然后调用 fork 创建一个新进程。子进程和父进程都可以访问 open()返回的文件描述符吗?当它们并发(即同时)写入文件时,会发生什么?</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">#include &lt;fcntl.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    int fd;</span><br><span class="line">    pid_t pid;</span><br><span class="line">    char *file_path = &quot;/path/to/file.txt&quot;;</span><br><span class="line"></span><br><span class="line">    fd = open(file_path, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);</span><br><span class="line">    if (fd == -1) &#123;</span><br><span class="line">        perror(&quot;open&quot;);</span><br><span class="line">        exit(EXIT_FAILURE);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    pid = fork();</span><br><span class="line">    if (pid == -1) &#123;</span><br><span class="line">        perror(&quot;fork&quot;);</span><br><span class="line">        exit(EXIT_FAILURE);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if (pid == 0) &#123;</span><br><span class="line">        // Child process</span><br><span class="line">        char *child_message = &quot;This is the child process writing to the file.\n&quot;;</span><br><span class="line">        write(fd, child_message, strlen(child_message));</span><br><span class="line">        exit(EXIT_SUCCESS);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        // Parent process</span><br><span class="line">        char *parent_message = &quot;This is the parent process writing to the file.\n&quot;;</span><br><span class="line">        write(fd, parent_message, strlen(parent_message));</span><br><span class="line">        exit(EXIT_SUCCESS);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个程序中，父进程和子进程都可以访问 <code>open</code>​ 返回的文件描述符 <code>fd</code>​。当它们并发（即同时）写入文件时，可能会发生数据交错的情况，也就是说，父进程和子进程的输出会混合在一起，而不是按照它们写入的顺序分开。这是因为在多进程环境下，操作系统会在进程之间切换，从而导致输出的顺序不确定。如果需要保证输出的顺序，需要使用进程间通信机制，如管道或共享内存等。</p>
+<p>但我的运行结果一直是父进程先输出</p>
+<p>这是因为在 fork() 调用后，父进程和子进程共享相同的文件描述符，即使它们有不同的进程 ID。当父进程和子进程同时写入文件时，由于操作系统的调度方式和速度的不同，很难预测哪个进程会首先写入文件。但是，无论哪个进程首先写入，它们写入的内容都会被保留，因为它们写入的文件描述符相同，不会发生竞争或冲突。因此，在这个程序中，父进程和子进程都会写入文件，并且它们写入的顺序不能保证，但是文件中应该包含两个消息。</p>
+<ol start="3">
+<li>使用 fork()编写另一个程序。子进程应打印“hello”,父进程应打印“goodbye”你应该尝试确保子进程始终先打印。你能否不在父进程调用 wait()而做到这一点呢?</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line"></span><br><span class="line">int main()&#123;</span><br><span class="line">    char *child_message = &quot;hello\n&quot;;</span><br><span class="line">    char *parent_message = &quot;goodbye\n&quot;;</span><br><span class="line">    pid_t pid = fork();</span><br><span class="line"></span><br><span class="line">    if(pid&lt;0)&#123;</span><br><span class="line">        fprintf(stderr,&quot;fork failed\n&quot;);</span><br><span class="line">        exit(1);</span><br><span class="line">    &#125;else if(pid==0)&#123;</span><br><span class="line">        printf(&quot;%s&quot;,child_message);</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        //pid_t wait_pid = wait();</span><br><span class="line">        sleep(1);</span><br><span class="line">        printf(&quot;%s&quot;,parent_message);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们可以使用sleep来让父进程休眠；如果我们不调用 <code>wait()</code> 或 <code>waitpid()</code> 函数来等待子进程结束，子进程可能会成为“僵尸进程”。</p>
+<ol start="4">
+<li><p>编写一个调用 fork()的程序,然后调用某种形式的 exec()来运行程序”&#x2F;bin&#x2F;ls”看看是否可以尝试 exec 的所有变体,包括 execl()、 execle()、 execlp()、 execv()、 execvp()和 execve(),为什么同样的基本调用会有这么多变种？</p>
+</li>
+<li><p>现在编写一个程序，在父进程中使用 wait(),等待子进程完成。wait()返回什么？如果你在子进程中使用 wait()会发生什么？</p>
+</li>
+<li><p>对前一个程序稍作修改，这次使用 waitpid()而不是 wait().什么时候 waitpid()会有用？</p>
+</li>
+<li><p>编写一个创建子进程的程序，然后在子进程中关闭标准输出（STDOUT_FILENO).如果子进程在关闭描述符后调用 printf() 打印输出，会发生什么？</p>
+</li>
+<li><p>编写一个程序，创建两个子进程，并使用 pipe()系统调用，将一个子进程的标准输出连接到另一个子进程的标准输入。</p>
+</li>
+</ol>
+<h1 id="第六章-机制：受限直接执行"><a href="#第六章-机制：受限直接执行" class="headerlink" title="第六章 机制：受限直接执行"></a>第六章 机制：受限直接执行</h1><h2 id=""><a href="#" class="headerlink" title=""></a></h2><h2 id="问题-2"><a href="#问题-2" class="headerlink" title="问题"></a>问题</h2><p><code>gettimeofday()</code>​ 函数用于获取当前的时间和时区信息，其函数原型如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;sys/time.h&gt;</span><br><span class="line"></span><br><span class="line">int gettimeofday(struct timeval *tv, struct timezone *tz);</span><br></pre></td></tr></table></figure>
+
+<p>其中，<code>tv</code>​ 是指向 <code>timeval</code>​ 结构体的指针，用于返回当前时间，<code>tz</code>​ 是指向 <code>timezone</code>​ 结构体的指针，用于返回当前时区信息。如果不需要时区信息，可以将 <code>tz</code>​ 设为 <code>NULL</code>​。</p>
+<p>函数返回值为 0 表示成功，-1 表示失败并设置 <code>errno</code>​ 错误码。</p>
+<h3 id="时钟的精确度"><a href="#时钟的精确度" class="headerlink" title="时钟的精确度"></a>时钟的精确度</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#include&lt;stdio.h&gt;</span><br><span class="line">#include&lt;sys/time.h&gt;</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">    struct timeval start,end;</span><br><span class="line">    for (int i = 0; i &lt; 10; i++)&#123;</span><br><span class="line">        gettimeofday(&amp;start,NULL);</span><br><span class="line">        gettimeofday(&amp;end,NULL);</span><br><span class="line">        printf(&quot;Begin: %d us,Time used: %d us,End: %d us \n&quot;,start.tv_usec,end.tv_usec-start.tv_usec,end.tv_usec);</span><br><span class="line">    &#125;</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Begin: 785855 us,Time used: 1 us,End: 785856 us </span><br><span class="line">Begin: 785945 us,Time used: 0 us,End: 785945 us </span><br><span class="line">Begin: 785950 us,Time used: 0 us,End: 785950 us </span><br><span class="line">Begin: 785954 us,Time used: 0 us,End: 785954 us </span><br><span class="line">Begin: 785957 us,Time used: 0 us,End: 785957 us </span><br><span class="line">Begin: 785960 us,Time used: 1 us,End: 785961 us </span><br><span class="line">Begin: 785964 us,Time used: 0 us,End: 785964 us </span><br><span class="line">Begin: 785968 us,Time used: 0 us,End: 785968 us </span><br><span class="line">Begin: 785971 us,Time used: 0 us,End: 785971 us </span><br><span class="line">Begin: 785974 us,Time used: 0 us,End: 785974 us</span><br></pre></td></tr></table></figure>
+
+<p>十次连续调用下函数耗时少，精度高，可以用来测量</p>
+<h4 id="CPU亲和性"><a href="#CPU亲和性" class="headerlink" title="CPU亲和性"></a>CPU亲和性</h4><p>在Linux系统中，可以使用sched_setaffinity()函数来设置线程的CPU亲和性，具体使用方法如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;sched.h&gt;</span><br><span class="line"></span><br><span class="line">int sched_setaffinity(pid_t pid, size_t cpusetsize, const cpu_set_t *mask);</span><br><span class="line"></span><br><span class="line">// 参数说明：</span><br><span class="line">// pid：要设置CPU亲和性的线程的ID，可以使用0表示当前线程</span><br><span class="line">// cpusetsize：mask参数的大小，一般使用sizeof(cpu_set_t)获取</span><br><span class="line">// mask：指向cpu_set_t类型的指针，表示要设置的CPU亲和性</span><br><span class="line"></span><br><span class="line">// 返回值：</span><br><span class="line">// 成功：0</span><br><span class="line">// 失败：-1，错误代码存储在errno中</span><br></pre></td></tr></table></figure>
+
+<p>其中，cpu_set_t类型是一个位掩码，每一位表示一个CPU核心，可以使用以下函数进行设置和清除：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;sched.h&gt;</span><br><span class="line"></span><br><span class="line">void CPU_ZERO(cpu_set_t *set);    // 清空所有CPU核心</span><br><span class="line">void CPU_SET(int cpu, cpu_set_t *set);    // 将指定CPU核心加入亲和性集合</span><br><span class="line">void CPU_CLR(int cpu, cpu_set_t *set);    // 将指定CPU核心从亲和性集合中删除</span><br><span class="line">int CPU_ISSET(int cpu, const cpu_set_t *set);    // 判断指定CPU核心是否在亲和性集合中</span><br></pre></td></tr></table></figure>
+
+<p>改进版本（单核心运行）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">#include&lt;sched.h&gt;</span><br><span class="line">//使该程序在单核CPU上运行</span><br><span class="line">void set_cpu(int cpu_number)</span><br><span class="line">&#123;</span><br><span class="line">    cpu_set_t mask;</span><br><span class="line">    CPU_ZERO(&amp;mask);</span><br><span class="line">    CPU_SET(cpu_number, &amp;mask);</span><br><span class="line">    if (sched_setaffinity(0, sizeof(mask), &amp;mask) == -1)</span><br><span class="line">    &#123;</span><br><span class="line">        printf(&quot;warning: could not set CPU affinity, continuing...\n&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">    set_cpu(0);</span><br><span class="line">    struct timeval start,end;</span><br><span class="line">    for (int i = 0; i &lt; 10; i++)&#123;</span><br><span class="line">        gettimeofday(&amp;start,NULL);</span><br><span class="line">        gettimeofday(&amp;end,NULL);</span><br><span class="line">        printf(&quot;Begin: %ld us,Time used: %ld us,End: %ld us \n&quot;,start.tv_usec,end.tv_usec-start.tv_usec,end.tv_usec);</span><br><span class="line">    &#125;</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br><span class="line">&quot;main.cpp&quot; 27L, 682C</span><br></pre></td></tr></table></figure>
+
+<h3 id="测量系统调用的上下文切换成本"><a href="#测量系统调用的上下文切换成本" class="headerlink" title="测量系统调用的上下文切换成本"></a>测量系统调用的上下文切换成本</h3><h1 id="第七章-进程调度：介绍"><a href="#第七章-进程调度：介绍" class="headerlink" title="第七章 进程调度：介绍"></a>第七章 进程调度：介绍</h1><p>操作系统调度程序采用的上层策略</p>
+<ul>
+<li><p>工作负载假设</p>
+<ul>
+<li>任务同时到达</li>
+<li>只使用cpu</li>
+<li>一旦开始保持运行到完成</li>
+<li>任务运行相同时间</li>
+<li>工作时间已知</li>
+</ul>
+</li>
+<li><p>先进先出 (First In First Out，FIFO) 调度算法：</p>
+<ul>
+<li>原理：按照进程到达的顺序依次分配CPU时间片，即先到达的进程先分配CPU时间，后到达的进程后分配CPU时间。</li>
+<li>特点：适用于长作业，但容易产生“饥饿”现象，即长时间等待CPU的进程可能一直无法被执行。</li>
+</ul>
+</li>
+<li><p>非抢占式短作业优先 (Shortest Job First，SJF) 调度算法：</p>
+<ul>
+<li>原理：按照进程的执行时间长度进行调度，即先执行执行时间短的进程，后执行执行时间长的进程。</li>
+<li>特点：可以保证平均等待时间最短，但无法预测进程执行时间，可能会出现长时间等待的情况。</li>
+</ul>
+</li>
+<li><p>抢占式短作业优先 (Shortest Remaining Time First，SRTF) 调度算法：</p>
+<ul>
+<li>原理：按照进程的剩余执行时间长度进行调度，当有新进程到达时，如果该进程的剩余执行时间比当前正在执行的进程的剩余执行时间短，则抢占CPU资源执行该进程，否则等待。</li>
+<li>特点：可以保证最短等待时间和最短周转时间，但需要不断更新进程的剩余执行时间，增加了调度的开销。</li>
+</ul>
+</li>
+<li><p>优先级 (Priority) 调度算法：</p>
+<ul>
+<li>原理：为每个进程分配一个优先级，按照优先级的高低进行调度，优先级高的进程先执行。</li>
+<li>特点：可以满足不同进程的不同需求，但容易出现“饥饿”现象，即优先级低的进程可能无法被执行。</li>
+</ul>
+</li>
+<li><p>最高相应比优先 (Highest Response Ratio Next，HRRN) 调度算法：</p>
+<ul>
+<li>原理：综合考虑进程的等待时间和执行时间，按照最高响应比进行调度，最高响应比的计算公式为：响应比 &#x3D; (等待时间 + 执行时间) &#x2F; 执行时间。</li>
+<li>特点：可以有效避免长作业等待时间过长的问题，但需要实时更新进程的等待时间和执行时间。</li>
+</ul>
+</li>
+</ul>
+<p>计算周转时间的公式为：周转时间 &#x3D; 完成时间 - 到达时间，其中完成时间为进程结束时的时间。</p>
+<ul>
+<li><p>响应时间&#x3D;首次运行-到达时间</p>
+</li>
+<li><p>轮转（RR）</p>
+<ul>
+<li>在一个时间片内运行一个工作然后切换到队列中的下一个任务</li>
+<li>时间片长度要考虑上下文切换的成本（权衡长度摊销成本）</li>
+</ul>
+</li>
+<li><p>重叠可以提高利用率（第五章作业）</p>
+</li>
+<li><p>结合I&#x2F;O</p>
+<ul>
+<li>保证交互运行</li>
+<li>将子工作视为独立的工作</li>
+</ul>
+</li>
+<li><p>当无法预测工作的长度该怎么办？</p>
+<ul>
+<li>使用多级反馈队列（下一章）</li>
+</ul>
+</li>
+</ul>
+<h2 id="问题-3"><a href="#问题-3" class="headerlink" title="问题"></a>问题</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">./scheduler -h</span><br><span class="line"></span><br><span class="line">Usage: scheduler.py [options]</span><br><span class="line"></span><br><span class="line">Options:</span><br><span class="line">  -h, --help            show this help message and exit</span><br><span class="line">  -s SEED, --seed=SEED  the random seed</span><br><span class="line">  -j JOBS, --jobs=JOBS  number of jobs in the system</span><br><span class="line">  -l JLIST, --jlist=JLIST</span><br><span class="line">                        instead of random jobs, provide a comma-separated list</span><br><span class="line">                        of run times</span><br><span class="line">  -m MAXLEN, --maxlen=MAXLEN</span><br><span class="line">                        max length of job</span><br><span class="line">  -p POLICY, --policy=POLICY</span><br><span class="line">                        sched policy to use: SJF, FIFO, RR</span><br><span class="line">  -q QUANTUM, --quantum=QUANTUM</span><br><span class="line">                        length of time slice for RR policy</span><br><span class="line">  -c                    compute answers for me</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><pre><code class="undefined">./scheduler.py -p FIFO -j 3 -l 200,200,200 -c
+Average -- Response: 200.00  Turnaround 400.00  Wait 200.00
+./scheduler.py -p SJF -j 3 -l 200,200,200 -c
+Average -- Response: 200.00  Turnaround 400.00  Wait 200.00
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">2. ```undefined</span><br><span class="line">   ./scheduler.py -p FIFO -j 3 -l 100,200,300 -c</span><br><span class="line">    Average -- Response: 133.33  Turnaround 333.33  Wait 133.33</span><br><span class="line">   ./scheduler.py -p SJF -j 3 -l 100,200,300 -c</span><br><span class="line">    Average -- Response: 133.33  Turnaround 333.33  Wait 133.33</span><br></pre></td></tr></table></figure>
+</code></pre>
+</li>
+<li><pre><code class="undefined">./scheduler.py -p RR -j 3 -l 200,200,200 -q 1 -c
+Average -- Response: 1.00  Turnaround 599.00  Wait 399.00
+</code></pre>
+</li>
+</ol>
+<p>添加 -q 1 选项，设置时间片为1，但是这个响应时间怪怪的</p>
+<p>好吧我懂了 响应时间指的是cpu第一次开始处理某个任务的时间</p>
+<ol start="4">
+<li><ol>
+<li>当作业长度相同时，SJF调度算法的顺序与FIFO调度算法的顺序相同。因此，当所有作业的长度相同时，SJF调度算法将提供与FIFO调度算法相同的周转时间。</li>
+<li>当所有作业的到达时间相同时，SJF调度算法将执行与FIFO调度算法相同的调度顺序。在这种情况下，SJF调度算法将提供与FIFO调度算法相同的周转时间。</li>
+</ol>
+</li>
+<li><ol>
+<li>当所有作业的长度相同时，SJF调度算法的顺序与RR调度算法的顺序相同。因此，在这种情况下，它们提供相同的响应时间。</li>
+<li>当所有进程的可用时间都相同时，并且RR算法的量子长度等于或大于所有进程的执行时间时，SJF算法和RR算法提供相同的响应时间。在这种情况下，SJF算法会立即选择可用时间最短的进程，并将其执行完毕。RR算法则会在相同的时间段内运行所有进程一次，因此如果所有进程的执行时间都不超过量子长度，则它们的响应时间将相同。</li>
+</ol>
+</li>
+<li><p>可能会增加，SJF算法可能不适合在具有变化的作业长度的系统中使用，因为它无法保证所有作业的响应时间都很短。</p>
+</li>
+<li><p>可能会增加或保持不变</p>
+</li>
+</ol>
+<h1 id="第八章-调度：多级反馈队列（MLFQ）"><a href="#第八章-调度：多级反馈队列（MLFQ）" class="headerlink" title="第八章 调度：多级反馈队列（MLFQ）"></a>第八章 调度：多级反馈队列（MLFQ）</h1><p>操作系统通常不知道工作要运行多久，而这又是SJF（或 STCF）等算法所必需的。MLFQ 希望给交互用户（如用户坐在屏幕前，等着进程结束）很好的交互体验，因此需要降低响应时间。</p>
+<h2 id="8-1-MLFQ：基本规则"><a href="#8-1-MLFQ：基本规则" class="headerlink" title="8.1 MLFQ：基本规则"></a>8.1 MLFQ：基本规则</h2><ul>
+<li><p>规则 1：如果 A 的优先级 &gt; B 的优先级，运行 A（不运行 B）。</p>
+</li>
+<li><p>规则 2：如果 A 的优先级 &#x3D; B 的优先级，轮转运行A 和 B。</p>
+</li>
+</ul>
+<p>这会导致低优先级的进程永远无法执行，该怎么办呢？</p>
+<h2 id="8-2-尝试-1：如何改变优先级"><a href="#8-2-尝试-1：如何改变优先级" class="headerlink" title="8.2 尝试 1：如何改变优先级"></a>8.2 尝试 1：如何改变优先级</h2><p>既有运行时间很短、频繁放弃 CPU 的交互型工作，也有需要很多 CPU 时间、响应时间却不重要的长时间计算密集型工作。</p>
+<ul>
+<li>规则 3：工作进入系统时，放在最高优先级（最上层队列）。</li>
+<li>规则 4a：工作用完整个时间片后，降低其优先级（移入下一个队列）。</li>
+</ul>
+<p>算法的一个主要目标：如果不知道工作是短工作还是长工作，那么就在开始的时候假设其是短工作，并赋予最高优先级。如果确实是短工作，则很快会执行完毕，否则将被慢慢移入低优先级队列，而这时该工作也被认为是长工作了。</p>
+<ul>
+<li>规则 4b：如果工作在其时间片以内主动释放 CPU，则优先级不变。</li>
+</ul>
+<p>针对IO的输入输出体验。</p>
+<p>但如果有程序主动定时放弃CPU来愚弄CPU呢，该怎么修改规则？</p>
+<h2 id="8-3-尝试-2：提升优先级"><a href="#8-3-尝试-2：提升优先级" class="headerlink" title="8.3 尝试 2：提升优先级"></a>8.3 尝试 2：提升优先级</h2><ul>
+<li>规则 5：经过一段时间 S，就将系统中所有工作重新加入最高优先级队列</li>
+</ul>
+<p>使得进程不会饿死。</p>
+<h2 id="8-4-尝试-3：更好的计时方式"><a href="#8-4-尝试-3：更好的计时方式" class="headerlink" title="8.4 尝试 3：更好的计时方式"></a>8.4 尝试 3：更好的计时方式</h2><ul>
+<li>规则 4：一旦工作用完了其在某一层中的时间配额（无论中间主动放弃了多少次CPU），就降低其优先级（移入低一级队列）。</li>
+</ul>
+<p>这样就解决了进程的优先级的问题，我们现在剩下的问题就是如何优化这个调度方案。</p>
+<h2 id="8-5-MLFQ-调优及其他问题"><a href="#8-5-MLFQ-调优及其他问题" class="headerlink" title="8.5 MLFQ 调优及其他问题"></a>8.5 MLFQ 调优及其他问题</h2><p>调整时间片。</p>
+<h2 id="作业"><a href="#作业" class="headerlink" title="作业"></a>作业</h2><h2 id="问题-4"><a href="#问题-4" class="headerlink" title="问题"></a>问题</h2><h1 id="第九章-调度：比例份额"><a href="#第九章-调度：比例份额" class="headerlink" title="第九章 调度：比例份额"></a>第九章 调度：比例份额</h1><p>一个不同类型的调度程序——比例份额（proportional-share）调度程序，有时也称为公平份额（fair-share）调度程序。比例份额算法基于一个简单的想法：调度程序的最终目标，是确保每个工作获得一定比例的 CPU 时间，而不是优化周转时间和响应时间。</p>
+<p>彩票机制：</p>
+<ul>
+<li>彩票货币</li>
+<li>彩票转让（客户端给服务端）</li>
+<li>彩票通胀</li>
+</ul>
+<p>实现：遍历累加判断大小</p>
+<p>例如，假设有三个进程A、B和C，它们分别获得了10、20和30张彩票，总共有60张彩票。当CPU时间片结束时，调度程序会随机抽取一张彩票，如果被选中的彩票属于进程B，则进程B将获得下一个时间片。</p>
+<p>彩票调度算法的优点是可以实现公平分配CPU时间片的目标，具有一定的随机性和不可预测性，避免了一些恶意进程长期占用CPU时间的问题。但是，由于彩票调度算法需要维护彩票池和进程的彩票数，因此需要较大的系统开销，且不能保证所有进程都能获得足够的CPU时间。</p>
+<p>步长调度：选择累积行程最短的任务执行</p>
+<p>在步长调度算法中，每个任务都有一个步长值，用于计算任务的累积行程。步长值通常根据任务的优先级和执行时间来确定。步长值较小的任务优先级较高，可以更快地执行。</p>
+<h2 id="作业-1"><a href="#作业-1" class="headerlink" title="作业"></a>作业</h2><h2 id="问题-5"><a href="#问题-5" class="headerlink" title="问题"></a>问题</h2><h1 id="第十章-多处理器调度（高级）"><a href="#第十章-多处理器调度（高级）" class="headerlink" title="第十章 多处理器调度（高级）"></a>第十章 多处理器调度（高级）</h1><p>增加了更多的 CPU 并没有让这类程序运行得更快，为了解决这个问题，不得不重写这些应用程序，使之能并行（parallel）执行，也许使用多线程（thread）。多线程需要使用策略来管理：</p>
+<p>与单CPU的区别：</p>
+<ul>
+<li><p>硬件缓存（cache）的使用</p>
+<ul>
+<li>时间局部性</li>
+<li>空间局部性</li>
+</ul>
+</li>
+<li><p>多处理器共享数据的方式</p>
+</li>
+</ul>
+<p><strong>问题：缓存一致性</strong></p>
+<p>解决方法：</p>
+<ul>
+<li><p>硬件角度</p>
+<ul>
+<li>通过监控内存访问</li>
+<li>总线窥探</li>
+</ul>
+</li>
+<li><p>程序角度</p>
+<ul>
+<li>保证原子操作</li>
+<li>加锁</li>
+</ul>
+</li>
+</ul>
+<p>会带来性能上的问题，随着cpu数量的增加。访问同步共享的数据结构会变慢。</p>
+<h2 id="缓存亲和度"><a href="#缓存亲和度" class="headerlink" title="缓存亲和度"></a>缓存亲和度</h2><p>程序运行在一个cpu上时，会在缓存中维护许多状态，下次该进程运行在相同的cpu上时运行得更快。</p>
+<p>多处理器调度应考虑这种缓存亲和性，并尽可能将进程保持在同一个cpu上。</p>
+<h2 id="单队列多处理器调度（SQMS）"><a href="#单队列多处理器调度（SQMS）" class="headerlink" title="单队列多处理器调度（SQMS）"></a>单队列多处理器调度（SQMS）</h2><ul>
+<li><p>优点：</p>
+<ul>
+<li>简单</li>
+<li>将原有的策略用于多个cpu</li>
+</ul>
+</li>
+<li><p>问题：</p>
+<ul>
+<li>缺乏可拓展性（需要加锁）</li>
+<li>性能损失</li>
+<li>工作不断在cpu间转移，违背缓存亲和性</li>
+</ul>
+</li>
+<li><p>解决：</p>
+<ul>
+<li>引入亲和性机制</li>
+<li>机制变复杂</li>
+<li>牺牲其他工作的亲和度来实现负载均衡</li>
+</ul>
+</li>
+</ul>
+<h2 id="多队列多处理器调度（MQMS）"><a href="#多队列多处理器调度（MQMS）" class="headerlink" title="多队列多处理器调度（MQMS）"></a>多队列多处理器调度（MQMS）</h2><p>将工作放入某个调度队列中</p>
+<p><img src="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230403083446-3027434.png" alt="image">​</p>
+<ul>
+<li><p>优点：</p>
+<ul>
+<li>避免了单队列中数据共享和同步带来的问题</li>
+<li>具有可拓展性：队列数量随着cpu增加而增加</li>
+<li>具有缓存亲和性</li>
+</ul>
+</li>
+<li><p>问题：</p>
+<ul>
+<li>无法实现负载均衡（利用多cpu）</li>
+</ul>
+</li>
+<li><p>解决：</p>
+<ul>
+<li>让工作移动（迁移）</li>
+<li>工作窃取（偷看其他队列的负载）</li>
+</ul>
+</li>
+<li><p>需要找到合适的阈值，不然会带来较高的系统开销</p>
+</li>
+</ul>
+<h4 id="Linux多处理器调度"><a href="#Linux多处理器调度" class="headerlink" title="Linux多处理器调度"></a>Linux多处理器调度</h4><p>不同的系统使用不同的调度策略</p>
+<h1 id="第十一章-CPU虚拟化总结"><a href="#第十一章-CPU虚拟化总结" class="headerlink" title="第十一章 CPU虚拟化总结"></a>第十一章 CPU虚拟化总结</h1><p>操作系统是一个拼接起来的怪物，这个怪物的每一部分都有许多实现方式，他们有一个共同的美好的哲学：高性能、可靠性但是一个美丽的解决方案最终还是少数，我们不得不做出妥协，不同的方案在特定的情况下效率更高，这就是计算机的工程。</p>
+<h1 id="第十二章-内存虚拟化"><a href="#第十二章-内存虚拟化" class="headerlink" title="第十二章 内存虚拟化"></a>第十二章 内存虚拟化</h1><p>虚拟化 &#x3D; 易用</p>
+<p>隔离与保护</p>
+<h1 id="第十三章-抽象：地址空间"><a href="#第十三章-抽象：地址空间" class="headerlink" title="第十三章 抽象：地址空间"></a>第十三章 抽象：地址空间</h1></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="http://wujean.github.io">WuJean</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="http://wujean.github.io/2023/04/03/HNU-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-%E7%AC%94%E8%AE%B0and%E4%BD%9C%E4%B8%9A/">http://wujean.github.io/2023/04/03/HNU-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-%E7%AC%94%E8%AE%B0and%E4%BD%9C%E4%B8%9A/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230403215050394.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/04/04/Esxi%E4%B8%8B%E9%85%8D%E7%BD%AEubuntu%E7%8E%AF%E5%A2%83%E5%8F%8Atesla-p4%E9%A9%B1%E5%8A%A8%E5%AE%89%E8%A3%85/" title="Esxi下配置ubuntu环境及tesla p4驱动安装"><img class="cover" src="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230407154110529.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">Previous Post</div><div class="prev_info">Esxi下配置ubuntu环境及tesla p4驱动安装</div></div></a></div><div class="next-post pull-right"><a href="/2023/04/02/Make-and-Makefile/" title="Make and Makefile"><img class="cover" src="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230402223938899.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">Make and Makefile</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">WuJean</div><div class="author-info__description">一些生活的片段</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">22</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">7</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/WuJean"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/WuJean" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:wujean1220@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BC%80%E5%A7%8B"><span class="toc-number">1.</span> <span class="toc-text">开始</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AC%AC4%E7%AB%A0-%E6%8A%BD%E8%B1%A1%EF%BC%9A%E8%BF%9B%E7%A8%8B"><span class="toc-number">2.</span> <span class="toc-text">第4章 抽象：进程</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1-%E6%8A%BD%E8%B1%A1%EF%BC%9A%E8%BF%9B%E7%A8%8B"><span class="toc-number">2.1.</span> <span class="toc-text">4.1 抽象：进程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2-%E8%BF%9B%E7%A8%8BAPI"><span class="toc-number">2.2.</span> <span class="toc-text">4.2 进程API</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3-%E8%BF%9B%E7%A8%8B%E5%88%9B%E5%BB%BA%EF%BC%9A%E6%9B%B4%E5%A4%9A%E7%BB%86%E8%8A%82"><span class="toc-number">2.3.</span> <span class="toc-text">4.3 进程创建：更多细节</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-4-%E8%BF%9B%E7%A8%8B%E7%8A%B6%E6%80%81"><span class="toc-number">2.4.</span> <span class="toc-text">4.4 进程状态</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-5-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="toc-number">2.5.</span> <span class="toc-text">4.5 数据结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%97%AE%E9%A2%98"><span class="toc-number">2.6.</span> <span class="toc-text">问题</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AC%AC%E4%BA%94%E7%AB%A0-%E6%8F%92%E5%8F%99%EF%BC%9A%E8%BF%9B%E7%A8%8BAPI"><span class="toc-number">3.</span> <span class="toc-text">第五章 插叙：进程API</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#5-1-fork%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="toc-number">3.1.</span> <span class="toc-text">5.1 fork系统调用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-2-wait%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="toc-number">3.2.</span> <span class="toc-text">5.2 wait系统调用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-3-exec%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="toc-number">3.3.</span> <span class="toc-text">5.3 exec系统调用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-4-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%99%E6%A0%B7%E8%AE%BE%E8%AE%A1API"><span class="toc-number">3.4.</span> <span class="toc-text">5.4 为什么这样设计API</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-5-%E5%85%B6%E4%BB%96API"><span class="toc-number">3.5.</span> <span class="toc-text">5.5 其他API</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%87%E6%A1%A3"><span class="toc-number">3.6.</span> <span class="toc-text">文档</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#fork-py"><span class="toc-number">3.6.1.</span> <span class="toc-text">fork.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#generator-py"><span class="toc-number">3.6.2.</span> <span class="toc-text">generator.py</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%97%AE%E9%A2%98-1"><span class="toc-number">3.7.</span> <span class="toc-text">问题</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AC%AC%E5%85%AD%E7%AB%A0-%E6%9C%BA%E5%88%B6%EF%BC%9A%E5%8F%97%E9%99%90%E7%9B%B4%E6%8E%A5%E6%89%A7%E8%A1%8C"><span class="toc-number">4.</span> <span class="toc-text">第六章 机制：受限直接执行</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">4.1.</span> <span class="toc-text"></span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%97%AE%E9%A2%98-2"><span class="toc-number">4.2.</span> <span class="toc-text">问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%B6%E9%92%9F%E7%9A%84%E7%B2%BE%E7%A1%AE%E5%BA%A6"><span class="toc-number">4.2.1.</span> <span class="toc-text">时钟的精确度</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#CPU%E4%BA%B2%E5%92%8C%E6%80%A7"><span class="toc-number">4.2.1.1.</span> <span class="toc-text">CPU亲和性</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B5%8B%E9%87%8F%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E7%9A%84%E4%B8%8A%E4%B8%8B%E6%96%87%E5%88%87%E6%8D%A2%E6%88%90%E6%9C%AC"><span class="toc-number">4.2.2.</span> <span class="toc-text">测量系统调用的上下文切换成本</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AC%AC%E4%B8%83%E7%AB%A0-%E8%BF%9B%E7%A8%8B%E8%B0%83%E5%BA%A6%EF%BC%9A%E4%BB%8B%E7%BB%8D"><span class="toc-number">5.</span> <span class="toc-text">第七章 进程调度：介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%97%AE%E9%A2%98-3"><span class="toc-number">5.1.</span> <span class="toc-text">问题</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AC%AC%E5%85%AB%E7%AB%A0-%E8%B0%83%E5%BA%A6%EF%BC%9A%E5%A4%9A%E7%BA%A7%E5%8F%8D%E9%A6%88%E9%98%9F%E5%88%97%EF%BC%88MLFQ%EF%BC%89"><span class="toc-number">6.</span> <span class="toc-text">第八章 调度：多级反馈队列（MLFQ）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#8-1-MLFQ%EF%BC%9A%E5%9F%BA%E6%9C%AC%E8%A7%84%E5%88%99"><span class="toc-number">6.1.</span> <span class="toc-text">8.1 MLFQ：基本规则</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-2-%E5%B0%9D%E8%AF%95-1%EF%BC%9A%E5%A6%82%E4%BD%95%E6%94%B9%E5%8F%98%E4%BC%98%E5%85%88%E7%BA%A7"><span class="toc-number">6.2.</span> <span class="toc-text">8.2 尝试 1：如何改变优先级</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-3-%E5%B0%9D%E8%AF%95-2%EF%BC%9A%E6%8F%90%E5%8D%87%E4%BC%98%E5%85%88%E7%BA%A7"><span class="toc-number">6.3.</span> <span class="toc-text">8.3 尝试 2：提升优先级</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-4-%E5%B0%9D%E8%AF%95-3%EF%BC%9A%E6%9B%B4%E5%A5%BD%E7%9A%84%E8%AE%A1%E6%97%B6%E6%96%B9%E5%BC%8F"><span class="toc-number">6.4.</span> <span class="toc-text">8.4 尝试 3：更好的计时方式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-5-MLFQ-%E8%B0%83%E4%BC%98%E5%8F%8A%E5%85%B6%E4%BB%96%E9%97%AE%E9%A2%98"><span class="toc-number">6.5.</span> <span class="toc-text">8.5 MLFQ 调优及其他问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%9C%E4%B8%9A"><span class="toc-number">6.6.</span> <span class="toc-text">作业</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%97%AE%E9%A2%98-4"><span class="toc-number">6.7.</span> <span class="toc-text">问题</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AC%AC%E4%B9%9D%E7%AB%A0-%E8%B0%83%E5%BA%A6%EF%BC%9A%E6%AF%94%E4%BE%8B%E4%BB%BD%E9%A2%9D"><span class="toc-number">7.</span> <span class="toc-text">第九章 调度：比例份额</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%9C%E4%B8%9A-1"><span class="toc-number">7.1.</span> <span class="toc-text">作业</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%97%AE%E9%A2%98-5"><span class="toc-number">7.2.</span> <span class="toc-text">问题</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AC%AC%E5%8D%81%E7%AB%A0-%E5%A4%9A%E5%A4%84%E7%90%86%E5%99%A8%E8%B0%83%E5%BA%A6%EF%BC%88%E9%AB%98%E7%BA%A7%EF%BC%89"><span class="toc-number">8.</span> <span class="toc-text">第十章 多处理器调度（高级）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BC%93%E5%AD%98%E4%BA%B2%E5%92%8C%E5%BA%A6"><span class="toc-number">8.1.</span> <span class="toc-text">缓存亲和度</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%95%E9%98%9F%E5%88%97%E5%A4%9A%E5%A4%84%E7%90%86%E5%99%A8%E8%B0%83%E5%BA%A6%EF%BC%88SQMS%EF%BC%89"><span class="toc-number">8.2.</span> <span class="toc-text">单队列多处理器调度（SQMS）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%9A%E9%98%9F%E5%88%97%E5%A4%9A%E5%A4%84%E7%90%86%E5%99%A8%E8%B0%83%E5%BA%A6%EF%BC%88MQMS%EF%BC%89"><span class="toc-number">8.3.</span> <span class="toc-text">多队列多处理器调度（MQMS）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Linux%E5%A4%9A%E5%A4%84%E7%90%86%E5%99%A8%E8%B0%83%E5%BA%A6"><span class="toc-number">8.3.0.1.</span> <span class="toc-text">Linux多处理器调度</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AC%AC%E5%8D%81%E4%B8%80%E7%AB%A0-CPU%E8%99%9A%E6%8B%9F%E5%8C%96%E6%80%BB%E7%BB%93"><span class="toc-number">9.</span> <span class="toc-text">第十一章 CPU虚拟化总结</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AC%AC%E5%8D%81%E4%BA%8C%E7%AB%A0-%E5%86%85%E5%AD%98%E8%99%9A%E6%8B%9F%E5%8C%96"><span class="toc-number">10.</span> <span class="toc-text">第十二章 内存虚拟化</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AC%AC%E5%8D%81%E4%B8%89%E7%AB%A0-%E6%8A%BD%E8%B1%A1%EF%BC%9A%E5%9C%B0%E5%9D%80%E7%A9%BA%E9%97%B4"><span class="toc-number">11.</span> <span class="toc-text">第十三章 抽象：地址空间</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/24/ucore-lab3/" title="ucore-lab3">ucore-lab3</a><time datetime="2023-04-24T05:25:13.000Z" title="Created 2023-04-24 13:25:13">2023-04-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/22/%E4%B8%80%E6%AC%A1%E8%AE%B2%E5%BE%97%E7%A8%80%E7%A2%8E%E7%9A%84%E8%AF%BE%E5%A0%82%E5%B1%95%E7%A4%BA%E7%9A%84%E5%8F%8D%E6%80%9D/" title="一次讲得稀碎的课堂展示的反思">一次讲得稀碎的课堂展示的反思</a><time datetime="2023-04-22T12:38:06.000Z" title="Created 2023-04-22 20:38:06">2023-04-22</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/21/ucore-lab2/" title="ucore-lab2">ucore-lab2</a><time datetime="2023-04-21T13:44:30.000Z" title="Created 2023-04-21 21:44:30">2023-04-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/17/CASPP-bomblab/" title="CASPP-bomblab">CASPP-bomblab</a><time datetime="2023-04-17T01:44:26.000Z" title="Created 2023-04-17 09:44:26">2023-04-17</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/11/ubuntu%E6%8D%A2%E6%BA%90%E5%85%A8%E8%A7%A3/" title="ubuntu换源全解">ubuntu换源全解</a><time datetime="2023-04-11T15:03:04.000Z" title="Created 2023-04-11 23:03:04">2023-04-11</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By WuJean</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/fireworks.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

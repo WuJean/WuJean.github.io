@@ -1,0 +1,201 @@
+<!DOCTYPE html><html lang="zh-Hans" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>Hexo博客配置多端编辑同步 | 岳麓山下你和我</title><meta name="author" content="WuJean"><meta name="copyright" content="WuJean"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="0x00 折腾的开始上一篇博客讲了如何搭建一个hexo的博客，配置操作在任何一个平台都是通用的。与wordpress这类带管理页面的动态博客不同，hexo静态page是需要自己在配置好的机子上手动上传的，如果使用多设备的话就会很不方便。苦主在宿舍用的是windows台式机，出门一般带着mac笔记本，在外常常写不了博客，于是便决定配置一个多端编辑同步来治好我拖更的习惯！ 0x01 多端同步原理讲到多">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo博客配置多端编辑同步">
+<meta property="og:url" content="http://wujean.github.io/2023/03/15/Hexo%E5%8D%9A%E5%AE%A2%E9%85%8D%E7%BD%AE%E5%A4%9A%E7%AB%AF%E7%BC%96%E8%BE%91%E5%90%8C%E6%AD%A5/index.html">
+<meta property="og:site_name" content="岳麓山下你和我">
+<meta property="og:description" content="0x00 折腾的开始上一篇博客讲了如何搭建一个hexo的博客，配置操作在任何一个平台都是通用的。与wordpress这类带管理页面的动态博客不同，hexo静态page是需要自己在配置好的机子上手动上传的，如果使用多设备的话就会很不方便。苦主在宿舍用的是windows台式机，出门一般带着mac笔记本，在外常常写不了博客，于是便决定配置一个多端编辑同步来治好我拖更的习惯！ 0x01 多端同步原理讲到多">
+<meta property="og:locale">
+<meta property="og:image" content="http://wujean.github.io/img/avatar.png">
+<meta property="article:published_time" content="2023-03-15T10:01:07.000Z">
+<meta property="article:modified_time" content="2023-09-05T01:21:03.712Z">
+<meta property="article:author" content="WuJean">
+<meta property="article:tag" content="Blog">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://wujean.github.io/img/avatar.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://wujean.github.io/2023/03/15/Hexo%E5%8D%9A%E5%AE%A2%E9%85%8D%E7%BD%AE%E5%A4%9A%E7%AB%AF%E7%BC%96%E8%BE%91%E5%90%8C%E6%AD%A5/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  }
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Hexo博客配置多端编辑同步',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-09-05 09:21:03'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">22</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">7</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">0</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/ToDo/"><span> 待办事项</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="岳麓山下你和我"><span class="site-name">岳麓山下你和我</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/ToDo/"><span> 待办事项</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Hexo博客配置多端编辑同步</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-03-15T10:01:07.000Z" title="Created 2023-03-15 18:01:07">2023-03-15</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-09-05T01:21:03.712Z" title="Updated 2023-09-05 09:21:03">2023-09-05</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">Word count:</span><span class="word-count">1k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">Reading time:</span><span>3min</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Hexo博客配置多端编辑同步"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="0x00-折腾的开始"><a href="#0x00-折腾的开始" class="headerlink" title="0x00 折腾的开始"></a>0x00 折腾的开始</h1><p>上一篇博客讲了如何搭建一个hexo的博客，配置操作在任何一个平台都是通用的。与wordpress这类带管理页面的动态博客不同，hexo静态page是需要自己在配置好的机子上手动上传的，如果使用多设备的话就会很不方便。苦主在宿舍用的是windows台式机，出门一般带着mac笔记本，在外常常写不了博客，于是便决定配置一个多端编辑同步来治好我拖更的习惯！</p>
+<h1 id="0x01-多端同步原理"><a href="#0x01-多端同步原理" class="headerlink" title="0x01 多端同步原理"></a>0x01 多端同步原理</h1><p>讲到多端同步我们就不得不提github了，我们的博客就是基于github page搭建的。一个很简单的思路就是在将我们的配置文件在每台机子上都配置一遍，然后在编辑结束后，未改动的机子将改动的内容同步，这样就能很简单的实现多端同步。</p>
+<p>但是单纯的复制粘贴会面临每台机子独特的.git文件不同、本地分支冲突、ssh key冲突等问题；git的分支功能很好的解决了该问题。</p>
+<p><code>hexo g</code>将我们的源文件部署， <code>hexo d</code>上传的只是网页部署文件，这些文件上传到了 github的 <code>master</code>分支，我们在另一台电脑上如果能够拥有源文件的话，同样将这些部署文件上传到 github 的 <code>master</code>分支即可，那么其实我们要做的就是备份源文件。</p>
+<p>那么我们可以在github的blog仓库<strong>新建一个分支，存储源文件，亦或者新建一个仓库，存储源文件</strong>即可，这样我们就可以在多个终端间同步源文件，而后就可以进行博客文件的终端同步了。</p>
+<h1 id="0x02-具体操作"><a href="#0x02-具体操作" class="headerlink" title="0x02 具体操作"></a>0x02 具体操作</h1><p>在你的username.github.io仓库中新建分支存储源文件的hexo分支，并设置为默认分支：</p>
+<p><img src="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230316200020542.png" alt="image-20230316200020542"></p>
+<h2 id="本地电脑操作"><a href="#本地电脑操作" class="headerlink" title="本地电脑操作"></a>本地电脑操作</h2><p>本地电脑任意目录下clone原仓库的内容，本步是为了获取仓库新分支的.git信息，clone结束后将文件夹中除了.git文件外其他文件删除：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> git@github.com:&lt;your rep url ,eg :name.github.io.git&gt;</span><br></pre></td></tr></table></figure>
+
+<p>将源文件（blog）文件夹中的除了.git文件全部复制进新文件夹中，如果你的主题是用clone来的，记得删除themes主题文件夹的.git文件，不然可以会因为git冲突无法实现上传。</p>
+<p>上传文件到hexo分支</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git add .</span><br><span class="line">git commit -m &quot;backup blog source file&quot;</span><br><span class="line">git push </span><br></pre></td></tr></table></figure>
+
+<p>如果没有报错，此时github端应该就可以看到备份的源文件了。</p>
+<h2 id="远程电脑操作"><a href="#远程电脑操作" class="headerlink" title="远程电脑操作"></a>远程电脑操作</h2><p>从仓库中将备份的源文件clone下来，在新文件夹中按照配置博客的方式安装好hexo博客的框架</p>
+<p>首先进行一些基础配置，安装git nodejs 配置git连接Github</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-cli -g			# intall hexo</span><br><span class="line"></span><br><span class="line"># 在该电脑的本地文件夹下clone Blog源文件</span><br><span class="line">git clone &lt;url&gt;</span><br></pre></td></tr></table></figure>
+
+<p>clone 成功后，进入blog文件夹下，安装之前安装的插件</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm install</span><br><span class="line">npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure>
+
+<p>然后就可以在新电脑上写博客了，将博客部署到网站后，记得备份源文件</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git add .</span><br><span class="line">git commit -m &quot;&quot;</span><br><span class="line">git push </span><br></pre></td></tr></table></figure>
+
+<h2 id="what‘s-more"><a href="#what‘s-more" class="headerlink" title="what‘s more"></a>what‘s more</h2><p>在远程电脑git push的过程中，github要求提供账号和密码的信息，但是苦主输入正确的账号密码后提示鉴权失败，几经查阅后发现github已经取消了使用账户名和密码登录的方式。我们需要获取token来获取对仓库的访问权限。</p>
+<p><img src="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230316201108111.png" alt="image-20230316201108111"></p>
+<p>记得勾选仓库的权限：</p>
+<p><img src="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230316201140232.png" alt="image-20230316201140232"></p>
+<p>随后将获取的key输入到密码中就可push成功！key只出现一次要注意保存。</p>
+<h1 id="0x03-如何使用"><a href="#0x03-如何使用" class="headerlink" title="0x03 如何使用"></a>0x03 如何使用</h1><p>在每次写博客之前先</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git pull 		//拉取最新的源文件</span><br></pre></td></tr></table></figure>
+
+<p>写完后</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push		//备份源文件</span><br></pre></td></tr></table></figure>
+
+<p>现在开始你快乐的写博客之旅啦，一定记得不能再鸽噢！</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="http://wujean.github.io">WuJean</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="http://wujean.github.io/2023/03/15/Hexo%E5%8D%9A%E5%AE%A2%E9%85%8D%E7%BD%AE%E5%A4%9A%E7%AB%AF%E7%BC%96%E8%BE%91%E5%90%8C%E6%AD%A5/">http://wujean.github.io/2023/03/15/Hexo%E5%8D%9A%E5%AE%A2%E9%85%8D%E7%BD%AE%E5%A4%9A%E7%AB%AF%E7%BC%96%E8%BE%91%E5%90%8C%E6%AD%A5/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Blog/">Blog</a></div><div class="post_share"><div class="social-share" data-image="/img/avatar.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/03/24/github%E5%AD%A6%E7%94%9F%E8%AE%A4%E8%AF%81%E7%94%B3%E8%AF%B7%E6%8C%87%E5%8D%97/" title="github学生认证申请指南"><img class="cover" src="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230324230506119.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">Previous Post</div><div class="prev_info">github学生认证申请指南</div></div></a></div><div class="next-post pull-right"><a href="/2023/03/14/NJU-pa1-%E7%9B%91%E8%A7%86%E7%82%B9/" title="NJU-pa1-监视点"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">NJU-pa1-监视点</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>Related Articles</span></div><div class="relatedPosts-list"><div><a href="/2023/03/04/Begin-your-Blog/" title="Begin your Blog"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-03-04</div><div class="title">Begin your Blog</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">WuJean</div><div class="author-info__description">一些生活的片段</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">22</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">7</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/WuJean"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/WuJean" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:wujean1220@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#0x00-%E6%8A%98%E8%85%BE%E7%9A%84%E5%BC%80%E5%A7%8B"><span class="toc-number">1.</span> <span class="toc-text">0x00 折腾的开始</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#0x01-%E5%A4%9A%E7%AB%AF%E5%90%8C%E6%AD%A5%E5%8E%9F%E7%90%86"><span class="toc-number">2.</span> <span class="toc-text">0x01 多端同步原理</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#0x02-%E5%85%B7%E4%BD%93%E6%93%8D%E4%BD%9C"><span class="toc-number">3.</span> <span class="toc-text">0x02 具体操作</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%AC%E5%9C%B0%E7%94%B5%E8%84%91%E6%93%8D%E4%BD%9C"><span class="toc-number">3.1.</span> <span class="toc-text">本地电脑操作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%9C%E7%A8%8B%E7%94%B5%E8%84%91%E6%93%8D%E4%BD%9C"><span class="toc-number">3.2.</span> <span class="toc-text">远程电脑操作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#what%E2%80%98s-more"><span class="toc-number">3.3.</span> <span class="toc-text">what‘s more</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#0x03-%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8"><span class="toc-number">4.</span> <span class="toc-text">0x03 如何使用</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/24/ucore-lab3/" title="ucore-lab3">ucore-lab3</a><time datetime="2023-04-24T05:25:13.000Z" title="Created 2023-04-24 13:25:13">2023-04-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/22/%E4%B8%80%E6%AC%A1%E8%AE%B2%E5%BE%97%E7%A8%80%E7%A2%8E%E7%9A%84%E8%AF%BE%E5%A0%82%E5%B1%95%E7%A4%BA%E7%9A%84%E5%8F%8D%E6%80%9D/" title="一次讲得稀碎的课堂展示的反思">一次讲得稀碎的课堂展示的反思</a><time datetime="2023-04-22T12:38:06.000Z" title="Created 2023-04-22 20:38:06">2023-04-22</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/21/ucore-lab2/" title="ucore-lab2">ucore-lab2</a><time datetime="2023-04-21T13:44:30.000Z" title="Created 2023-04-21 21:44:30">2023-04-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/17/CASPP-bomblab/" title="CASPP-bomblab">CASPP-bomblab</a><time datetime="2023-04-17T01:44:26.000Z" title="Created 2023-04-17 09:44:26">2023-04-17</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/11/ubuntu%E6%8D%A2%E6%BA%90%E5%85%A8%E8%A7%A3/" title="ubuntu换源全解">ubuntu换源全解</a><time datetime="2023-04-11T15:03:04.000Z" title="Created 2023-04-11 23:03:04">2023-04-11</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By WuJean</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/fireworks.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

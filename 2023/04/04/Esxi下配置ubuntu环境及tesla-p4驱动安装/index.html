@@ -1,0 +1,239 @@
+<!DOCTYPE html><html lang="zh-Hans" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>Esxi下配置ubuntu环境及tesla p4驱动安装 | 岳麓山下你和我</title><meta name="author" content="WuJean"><meta name="copyright" content="WuJean"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="本文记录了在nuc9上的esxi环境下安装ubuntu22.04虚拟机，并安装tesla p4驱动的过程。 笔者的windows电脑嫌麻烦没装双系统，虽然wsl2用起来非常丝滑，但由于还没折腾好ssh连接wsl，以及win机子总不可能一直开着机，在外想用下linux环境时还是有一台本地的主机比较方便；有了上次过年背电脑回家的惨痛经历，以后回家就背nuc9回家了mac+nuc9+tesla p4，移">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Esxi下配置ubuntu环境及tesla p4驱动安装">
+<meta property="og:url" content="http://wujean.github.io/2023/04/04/Esxi%E4%B8%8B%E9%85%8D%E7%BD%AEubuntu%E7%8E%AF%E5%A2%83%E5%8F%8Atesla-p4%E9%A9%B1%E5%8A%A8%E5%AE%89%E8%A3%85/index.html">
+<meta property="og:site_name" content="岳麓山下你和我">
+<meta property="og:description" content="本文记录了在nuc9上的esxi环境下安装ubuntu22.04虚拟机，并安装tesla p4驱动的过程。 笔者的windows电脑嫌麻烦没装双系统，虽然wsl2用起来非常丝滑，但由于还没折腾好ssh连接wsl，以及win机子总不可能一直开着机，在外想用下linux环境时还是有一台本地的主机比较方便；有了上次过年背电脑回家的惨痛经历，以后回家就背nuc9回家了mac+nuc9+tesla p4，移">
+<meta property="og:locale">
+<meta property="og:image" content="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230407154110529.png">
+<meta property="article:published_time" content="2023-04-04T09:15:35.000Z">
+<meta property="article:modified_time" content="2023-09-05T01:21:03.712Z">
+<meta property="article:author" content="WuJean">
+<meta property="article:tag" content="Homelab">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230407154110529.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://wujean.github.io/2023/04/04/Esxi%E4%B8%8B%E9%85%8D%E7%BD%AEubuntu%E7%8E%AF%E5%A2%83%E5%8F%8Atesla-p4%E9%A9%B1%E5%8A%A8%E5%AE%89%E8%A3%85/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  }
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Esxi下配置ubuntu环境及tesla p4驱动安装',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-09-05 09:21:03'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">22</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">7</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">0</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/ToDo/"><span> 待办事项</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230407154110529.png')"><nav id="nav"><span id="blog-info"><a href="/" title="岳麓山下你和我"><span class="site-name">岳麓山下你和我</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/ToDo/"><span> 待办事项</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Esxi下配置ubuntu环境及tesla p4驱动安装</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-04-04T09:15:35.000Z" title="Created 2023-04-04 17:15:35">2023-04-04</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-09-05T01:21:03.712Z" title="Updated 2023-09-05 09:21:03">2023-09-05</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">Word count:</span><span class="word-count">1.3k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">Reading time:</span><span>4min</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Esxi下配置ubuntu环境及tesla p4驱动安装"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>本文记录了在nuc9上的esxi环境下安装ubuntu22.04虚拟机，并安装tesla p4驱动的过程。</p>
+<p>笔者的windows电脑嫌麻烦没装双系统，虽然wsl2用起来非常丝滑，但由于还没折腾好ssh连接wsl，以及win机子总不可能一直开着机，在外想用下linux环境时还是有一台本地的主机比较方便；有了上次过年背电脑回家的惨痛经历，以后回家就背nuc9回家了mac+nuc9+tesla p4，移动工作站yyds！</p>
+<h1 id="esxi环境下安装ubuntu虚拟机"><a href="#esxi环境下安装ubuntu虚拟机" class="headerlink" title="esxi环境下安装ubuntu虚拟机"></a>esxi环境下安装ubuntu虚拟机</h1><h2 id="获取ubuntu-ISO"><a href="#获取ubuntu-ISO" class="headerlink" title="获取ubuntu ISO"></a>获取ubuntu ISO</h2><p>在ubuntu官网下载iso文件，笔者暂时没有可视化桌面的需求，故下载LTS版本的ios</p>
+<p><a target="_blank" rel="noopener" href="https://ubuntu.com/download/server">https://ubuntu.com/download/server</a></p>
+<p>将下载好的镜像文件上传到esxi的目录中：</p>
+<p><img src="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230405101938127.png" alt="image-20230405101938127"></p>
+<h2 id="切换显卡直通"><a href="#切换显卡直通" class="headerlink" title="切换显卡直通"></a>切换显卡直通</h2><p>在 ESXi (VMware ESXi) 中，显卡直通（GPU Passthrough）是一种技术，允许将主机上的物理显卡直接分配给虚拟机，使虚拟机能够独占地访问显卡资源，而不与其他虚拟机或主机共享。这使得虚拟机可以在物理显卡上运行图形密集型应用程序，如游戏、图形渲染、人工智能等，而无需通过虚拟化软件进行图形加速或共享显卡资源。</p>
+<p>暑假的时候迷上了捡计算卡垃圾；笔者的主力机上用的是tesla p4，nuc9小机箱当然得用上p40的儿子p4啦；不用独立供电，改完风扇后刚刚好可以塞进nuc9里，简直是天作之合；由于暂时没有搞vgpu的需求，故先将p4直通给ubuntu做日常炼丹使用。</p>
+<p><img src="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230405102419330.png" alt="image-20230405102419330"></p>
+<h2 id="配置虚拟机"><a href="#配置虚拟机" class="headerlink" title="配置虚拟机"></a>配置虚拟机</h2><p>选择cpu和内存选项，在CD&#x2F;DVD驱动器中选择你上传的ubuntu镜像</p>
+<p>添加PCI设备选择tesla p4；若没设置显卡直通，这一步将找不到PCI设备。</p>
+<p><img src="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230405102917555.png" alt="image-20230405102917555"></p>
+<p>配置完后选择打开电源，若显示内存分配错误无法打开电源，重新编辑虚拟机，勾选预留所有客户机内容的选项：</p>
+<p><img src="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230405103801593.png" alt="image-20230405103801593"></p>
+<p>接下来就是很正常的安装虚拟机的过程了，注意在安装完成后选择不进行更新立即重启，可以省点时间。</p>
+<p><img src="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230405105631938.png" alt="image-20230405105631938"></p>
+<p>关闭电源后移除ISO文件，再次重启：</p>
+<p><img src="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230405110446340.png" alt="image-20230405110446340"></p>
+<p>输入用户名和密码后登陆成功，完成系统的安装。</p>
+<h2 id="安装显卡驱动"><a href="#安装显卡驱动" class="headerlink" title="安装显卡驱动"></a>安装显卡驱动</h2><p>！！！！！！！！我折腾了两天真的，整整两天，踩过了无数的坑，最后总结出一套快速安装的方法，我不知道里面哪些操作是必要的，但是这边建议完全按照我的操作来做！！！！！！！！</p>
+<h3 id="设置显卡直通"><a href="#设置显卡直通" class="headerlink" title="设置显卡直通"></a>设置显卡直通</h3><p>首先我们要确定你的显卡是否可以直通，如果可以的话在管理页面切换显卡直通：</p>
+<p><img src="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230407151941111.png" alt="image-20230407151941111"></p>
+<p>最重要的一步来了！</p>
+<p>在虚拟机设置中编辑以下几个选项：</p>
+<p>取消勾选安全启动，这样在安装驱动的时候不会被限制而导致安装失败：</p>
+<p><img src="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230407152514823.png" alt="image-20230407152514823"></p>
+<p>编辑高级配置：</p>
+<ul>
+<li>pciPassthru.64bitMMIOSizeGB &#x3D; 你的显存*2</li>
+<li>pciPassthru.use64bitMMIO &#x3D; TRUE<ul>
+<li>hypervisor.cpuid.v0 &#x3D; FALSE	&#x2F;&#x2F;让显卡以为自己不在虚拟环境中</li>
+</ul>
+</li>
+</ul>
+<p>然后重新引导你的esxi系统，这样才能在虚拟机中找到显卡</p>
+<p><img src="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230407152629277.png" alt="image-20230407152629277"></p>
+<h2 id="安装显卡驱动-1"><a href="#安装显卡驱动-1" class="headerlink" title="安装显卡驱动"></a>安装显卡驱动</h2><h3 id="禁用nouveau-nouveau是通用的驱动程序-（必须）"><a href="#禁用nouveau-nouveau是通用的驱动程序-（必须）" class="headerlink" title="禁用nouveau(nouveau是通用的驱动程序)（必须）"></a>禁用nouveau(nouveau是通用的驱动程序)（必须）</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vi /etc/modprobe.d/blacklist.conf</span><br></pre></td></tr></table></figure>
+
+<p>在最后两行添加：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">blacklist nouveau</span><br><span class="line">     </span><br><span class="line">options nouveau modeset=0</span><br></pre></td></tr></table></figure>
+
+<p>在终端输入如下更新，更新结束后重启电脑（必须）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo update-initramfs –u</span><br></pre></td></tr></table></figure>
+
+<p>重启后在终端输入如下，没有任何输出表示屏蔽成功</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lsmod | grep nouveau</span><br></pre></td></tr></table></figure>
+
+<h3 id="下载驱动"><a href="#下载驱动" class="headerlink" title="下载驱动"></a>下载驱动</h3><p>这边有两种方法：</p>
+<ul>
+<li>一种是ubuntu22.04支持apt下载驱动</li>
+<li>另一种是自己到官网找安装包进行下载。</li>
+</ul>
+<p>由于自动下载驱动的方式不适用与本环境，下载后会显示找不到设备，故只做记录</p>
+<h4 id="自动下载驱动"><a href="#自动下载驱动" class="headerlink" title="自动下载驱动"></a>自动下载驱动</h4><p>添加第三方的驱动仓库：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo add-apt-repository ppa:graphics-drivers/ppa</span><br></pre></td></tr></table></figure>
+
+<p>更新软件列表:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt update</span><br></pre></td></tr></table></figure>
+
+<p>通过以下指令查看推荐的驱动版本:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ubuntu-drivers devices</span><br></pre></td></tr></table></figure>
+
+<p>apt自选驱动下载即可</p>
+<h4 id="手动安装驱动"><a href="#手动安装驱动" class="headerlink" title="手动安装驱动"></a>手动安装驱动</h4><p>进入官网找到合适的驱动：<a target="_blank" rel="noopener" href="https://www.nvidia.cn/Download/index.aspx?lang=cn">https://www.nvidia.cn/Download/index.aspx?lang=cn</a></p>
+<p>使用wget命令下载到虚拟机上并赋予执行的权限</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ./NVIDIA-Linux-x86_64-你的驱动版本.run -no-x-check -no-nouveau-check -no-opengl-files </span><br></pre></td></tr></table></figure>
+
+<p>一路yes下来后重启查看是否安装成功</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nvidia-smi </span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230407154110529.png" alt="image-20230407154110529"></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>找资料的能力非常重要，一份好的资料能使得工作事半功倍</p>
+<p>感谢大佬们写的文章，由衷感谢<a target="_blank" rel="noopener" href="https://www.v2ex.com/t/905583%E6%8F%90%E4%BE%9B%E7%9A%84%E5%92%8C%E6%88%91%E4%B8%80%E6%A0%B7%E7%9A%84%E7%8E%AF%E5%A2%83%E7%9A%84%E9%85%8D%E7%BD%AE%E6%88%90%E5%8A%9F%E7%9A%84%E6%A1%88%E4%BE%8B%EF%BC%8C%E8%AE%A9%E6%88%91%E6%9C%89%E4%BA%86%E7%BB%A7%E7%BB%AD%E4%B8%8B%E5%8E%BB%E7%9A%84%E5%8A%A8%E5%8A%9B%E3%80%82">https://www.v2ex.com/t/905583提供的和我一样的环境的配置成功的案例，让我有了继续下去的动力。</a></p>
+<p>接下来就是配置深度学习环境的过程了。</p>
+<p>经过本地对驱动和虚拟机的折腾，让我对虚拟机的架构以及驱动的安装有了初步的认识，相信下一次配驱动一定能更加得心应手。有同样的问题的兄弟可以来dd我，一起交流学习解决问题！</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="http://wujean.github.io">WuJean</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="http://wujean.github.io/2023/04/04/Esxi%E4%B8%8B%E9%85%8D%E7%BD%AEubuntu%E7%8E%AF%E5%A2%83%E5%8F%8Atesla-p4%E9%A9%B1%E5%8A%A8%E5%AE%89%E8%A3%85/">http://wujean.github.io/2023/04/04/Esxi%E4%B8%8B%E9%85%8D%E7%BD%AEubuntu%E7%8E%AF%E5%A2%83%E5%8F%8Atesla-p4%E9%A9%B1%E5%8A%A8%E5%AE%89%E8%A3%85/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Homelab/">Homelab</a></div><div class="post_share"><div class="social-share" data-image="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230407154110529.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/04/04/openwrt%E9%85%8D%E7%BD%AE-%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F%E5%8F%8A%E5%AE%BF%E8%88%8D%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91/" title="openwrt配置-内网穿透及宿舍科学上网"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">Previous Post</div><div class="prev_info">openwrt配置-内网穿透及宿舍科学上网</div></div></a></div><div class="next-post pull-right"><a href="/2023/04/03/HNU-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-%E7%AC%94%E8%AE%B0and%E4%BD%9C%E4%B8%9A/" title="HNU-操作系统-笔记and作业"><img class="cover" src="https://raw.githubusercontent.com/WuJean/Picgo-blog/main/image-20230403215050394.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">HNU-操作系统-笔记and作业</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>Related Articles</span></div><div class="relatedPosts-list"><div><a href="/2023/04/04/openwrt%E9%85%8D%E7%BD%AE-%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F%E5%8F%8A%E5%AE%BF%E8%88%8D%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91/" title="openwrt配置-内网穿透及宿舍科学上网"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-04-04</div><div class="title">openwrt配置-内网穿透及宿舍科学上网</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">WuJean</div><div class="author-info__description">一些生活的片段</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">22</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">7</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/WuJean"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/WuJean" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:wujean1220@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#esxi%E7%8E%AF%E5%A2%83%E4%B8%8B%E5%AE%89%E8%A3%85ubuntu%E8%99%9A%E6%8B%9F%E6%9C%BA"><span class="toc-number">1.</span> <span class="toc-text">esxi环境下安装ubuntu虚拟机</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96ubuntu-ISO"><span class="toc-number">1.1.</span> <span class="toc-text">获取ubuntu ISO</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%87%E6%8D%A2%E6%98%BE%E5%8D%A1%E7%9B%B4%E9%80%9A"><span class="toc-number">1.2.</span> <span class="toc-text">切换显卡直通</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E8%99%9A%E6%8B%9F%E6%9C%BA"><span class="toc-number">1.3.</span> <span class="toc-text">配置虚拟机</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%89%E8%A3%85%E6%98%BE%E5%8D%A1%E9%A9%B1%E5%8A%A8"><span class="toc-number">1.4.</span> <span class="toc-text">安装显卡驱动</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AE%E6%98%BE%E5%8D%A1%E7%9B%B4%E9%80%9A"><span class="toc-number">1.4.1.</span> <span class="toc-text">设置显卡直通</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%89%E8%A3%85%E6%98%BE%E5%8D%A1%E9%A9%B1%E5%8A%A8-1"><span class="toc-number">1.5.</span> <span class="toc-text">安装显卡驱动</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A6%81%E7%94%A8nouveau-nouveau%E6%98%AF%E9%80%9A%E7%94%A8%E7%9A%84%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F-%EF%BC%88%E5%BF%85%E9%A1%BB%EF%BC%89"><span class="toc-number">1.5.1.</span> <span class="toc-text">禁用nouveau(nouveau是通用的驱动程序)（必须）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%8B%E8%BD%BD%E9%A9%B1%E5%8A%A8"><span class="toc-number">1.5.2.</span> <span class="toc-text">下载驱动</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%87%AA%E5%8A%A8%E4%B8%8B%E8%BD%BD%E9%A9%B1%E5%8A%A8"><span class="toc-number">1.5.2.1.</span> <span class="toc-text">自动下载驱动</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%89%8B%E5%8A%A8%E5%AE%89%E8%A3%85%E9%A9%B1%E5%8A%A8"><span class="toc-number">1.5.2.2.</span> <span class="toc-text">手动安装驱动</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">1.6.</span> <span class="toc-text">总结</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/24/ucore-lab3/" title="ucore-lab3">ucore-lab3</a><time datetime="2023-04-24T05:25:13.000Z" title="Created 2023-04-24 13:25:13">2023-04-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/22/%E4%B8%80%E6%AC%A1%E8%AE%B2%E5%BE%97%E7%A8%80%E7%A2%8E%E7%9A%84%E8%AF%BE%E5%A0%82%E5%B1%95%E7%A4%BA%E7%9A%84%E5%8F%8D%E6%80%9D/" title="一次讲得稀碎的课堂展示的反思">一次讲得稀碎的课堂展示的反思</a><time datetime="2023-04-22T12:38:06.000Z" title="Created 2023-04-22 20:38:06">2023-04-22</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/21/ucore-lab2/" title="ucore-lab2">ucore-lab2</a><time datetime="2023-04-21T13:44:30.000Z" title="Created 2023-04-21 21:44:30">2023-04-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/17/CASPP-bomblab/" title="CASPP-bomblab">CASPP-bomblab</a><time datetime="2023-04-17T01:44:26.000Z" title="Created 2023-04-17 09:44:26">2023-04-17</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/11/ubuntu%E6%8D%A2%E6%BA%90%E5%85%A8%E8%A7%A3/" title="ubuntu换源全解">ubuntu换源全解</a><time datetime="2023-04-11T15:03:04.000Z" title="Created 2023-04-11 23:03:04">2023-04-11</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By WuJean</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/fireworks.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
